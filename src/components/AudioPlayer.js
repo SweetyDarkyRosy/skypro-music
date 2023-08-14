@@ -1,7 +1,21 @@
+import { useEffect, useState } from 'react';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css'
 import './AudioPlayer.css';
 
 
 function AudioPlayer() {
+  const [isLoaded, setLoadedState] = useState(false);
+
+  useEffect(() => {
+      setTimeout(() => {
+          setLoadedState(true);
+        }, 5000);
+
+      return () => {}
+    }, []);
+
+  
 	return (
 		<div className="bar">
           <div className="bar__content">
@@ -39,17 +53,33 @@ function AudioPlayer() {
                 <div className="player__track-play track-play">
                   <div className="track-play__contain">
                     <div className="track-play__image">
+                    {isLoaded ? (
                       <svg className="track-play__svg" alt="music">
                         <use xlinkHref="img/icon/sprite.svg#icon-note"></use>
                       </svg>
+                    ) : (
+                      <SkeletonTheme baseColor="#313131" highlightColor="#444">
+                        <Skeleton variant="rectangular" width={51} height={51}/>
+                      </SkeletonTheme>
+                    )}
                     </div>
                     <div className="track-play__author">
-                      <a className="track-play__author-link" href="http://"
-                        >Ты та...</a
-                      >
+                    {isLoaded ? (
+                      <a className="track-play__author-link" href="http://">Ты та...</a>
+                    ) : (
+                      <SkeletonTheme baseColor="#313131" highlightColor="#444">
+                        <Skeleton variant="rectangular" width={59} height={15}/>
+                      </SkeletonTheme>
+                    )}
                     </div>
                     <div className="track-play__album">
+                    {isLoaded ? (
                       <a className="track-play__album-link" href="http://">Баста</a>
+                    ) : (
+                      <SkeletonTheme baseColor="#313131" highlightColor="#444">
+                        <Skeleton variant="rectangular" width={59} height={15}/>
+                      </SkeletonTheme>
+                    )}
                     </div>
                   </div>
 
