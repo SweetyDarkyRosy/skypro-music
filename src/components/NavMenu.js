@@ -1,5 +1,70 @@
 import { useState } from 'react';
-import './NavMenu.css';
+import styled from 'styled-components';
+
+
+const NavMenuEl = styled.nav`
+  width: 244px;
+	background-color: #181818;
+	padding: 20px 0 20px 36px;
+`;
+
+const NavLogo = styled.div`
+  width: 113.33px;
+  height: 43px;
+  padding: 13px 0 13px 0;
+  background-color: transparent;
+  margin-bottom: 20px;
+`;
+
+const LogoImg = styled.img`
+  width: 113.33px;
+  height: 17px;
+  color: #181818;
+`;
+
+const Menu = styled.div`
+  display: block;
+	visibility: visible;
+`;
+
+const MenuList = styled.ul`
+  padding: 18px 0 10px 0;
+`;
+
+const MenuItem = styled.li`
+  padding: 5px 0;
+  margin-bottom: 16px;
+`;
+
+const MenuLink = styled.a`
+  color: #ffffff;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+`;
+
+const NavBurger = styled.div`
+  width: 20px;
+  height: 36px;
+  padding: 13px 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+`;
+
+const BurgerLine = styled.span`
+  display: inline-block;
+	width: 100%;
+	height: 1px;
+	background-color: #d3d3d3;
+`;
 
 
 function NavMenu() {
@@ -9,31 +74,31 @@ function NavMenu() {
 
 
 	return (
-		<nav className="main__nav nav">
-      <div className="nav__logo logo">
-        <img className="logo__image" src="img/logo.png" alt="logo" />
-      </div>
-      <div className="nav__burger burger" onClick={toggleMenuVisibility}>
-        <span className="burger__line"></span>
-        <span className="burger__line"></span>
-        <span className="burger__line"></span>
-      </div>
+		<NavMenuEl className="nav">
+      <NavLogo className="logo">
+        <LogoImg src="img/logo.png" alt="logo"/>
+      </NavLogo>
+      <NavBurger className="burger" onClick={toggleMenuVisibility}>
+        <BurgerLine></BurgerLine>
+        <BurgerLine></BurgerLine>
+        <BurgerLine></BurgerLine>
+      </NavBurger>
       {isMenuVisible && (
-        <div className="nav__menu menu">
-          <ul className="menu__list">
-            <li className="menu__item">
-              <a href="#" className="menu__link">Главное</a>
-            </li>
-            <li className="menu__item">
-              <a href="#" className="menu__link">Мой плейлист</a>
-            </li>
-            <li className="menu__item">
-              <a href="../signin.html" className="menu__link">Войти</a>
-            </li>
-          </ul>
-        </div>)
+        <Menu className="menu">
+          <MenuList>
+            <MenuItem>
+              <MenuLink href="#">Главное</MenuLink>
+            </MenuItem>
+            <MenuItem>
+              <MenuLink href="#">Мой плейлист</MenuLink>
+            </MenuItem>
+            <MenuItem>
+              <MenuLink href="../signin.html">Войти</MenuLink>
+            </MenuItem>
+          </MenuList>
+        </Menu>)
       }
-    </nav>);
+    </NavMenuEl>);
 }
 	
 export default NavMenu;

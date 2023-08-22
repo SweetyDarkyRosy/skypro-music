@@ -1,10 +1,26 @@
 import { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import styled from 'styled-components';
 import 'react-loading-skeleton/dist/skeleton.css'
-import './Playlist.css';
 
 
-function Playlist(props) {
+const SidebarItem = styled.div`
+  width: 250px;
+  height: 150px;
+`;
+
+const SidebarLink = styled.a`
+  width: 100%;
+	height: 100%;
+`;
+
+const SidebarImg = styled.img`
+  width: 100%;
+	height: auto;
+`;
+
+
+function Playlist({ imageSrcPath }) {
   const [isLoaded, setLoadedState] = useState(false);
 
   useEffect(() => {
@@ -16,12 +32,11 @@ function Playlist(props) {
     }, []);
 
 	return (
-      <div className="sidebar__item">
-        <a className="sidebar__link" href="#">
+      <SidebarItem>
+        <SidebarLink href="#">
         {isLoaded ? (
-          <img
-            className="sidebar__img"
-            src={props.imageSrcPath}
+          <SidebarImg
+            src={ imageSrcPath }
             alt="day's playlist"
           />
         ) : (
@@ -29,8 +44,8 @@ function Playlist(props) {
             <Skeleton variant="rectangular" width={250} height={150}/>
           </SkeletonTheme>
         )}
-        </a>
-      </div>
+        </SidebarLink>
+      </SidebarItem>
 	);
 }
 	

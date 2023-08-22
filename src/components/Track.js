@@ -1,7 +1,132 @@
 import { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
-import './Track.css';
+import styled from 'styled-components';
+
+
+const PlaylistItem = styled.div`
+  width: 100%;
+  display: block;
+  margin-bottom: 12px;
+`;
+
+const PlaylistTrack = styled.div`
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+`;
+
+const TrackTitle = styled.div`
+  display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: row;
+	flex-direction: row;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	width: 447px;
+`;
+
+const TrackTitleImg = styled.div`
+  width: 51px;
+	height: 51px;
+	padding: 16px;
+	background: #313131;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	margin-right: 17px;
+`;
+
+const TrackTitleSvg = styled.svg`
+  width: 18px;
+	height: 17px;
+	fill: transparent;
+	stroke: #4e4e4e;
+`;
+
+const TrackTitleLink = styled.a`
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #ffffff;
+`;
+
+const TrackTitleSpan = styled.span`
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #4e4e4e;
+`;
+
+const TrackAuthor = styled.div`
+  width: 321px;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-pack: start;
+	-ms-flex-pack: start;
+	justify-content: flex-start;
+`;
+
+const TrackAuthorLink = styled.a`
+  font-style: normal;
+	font-weight: 400;
+	font-size: 16px;
+	line-height: 24px;
+	color: #ffffff;
+	text-align: left;
+`;
+
+const TrackAlbum = styled.div`
+  width: 245px;
+`;
+
+const TrackAlbumLink = styled.a`
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #696969;
+`;
+
+const TrackTimeSvg = styled.svg`
+  width: 14px;
+  height: 12px;
+  margin-right: 17px;
+  fill: transparent;
+  stroke: #696969;
+`;
+
+const TrackTimeText = styled.span`
+  font-style: normal;
+	font-weight: 400;
+	font-size: 16px;
+	line-height: 24px;
+	text-align: right;
+	color: #696969;
+`;
 
 
 function Track(props) {
@@ -16,49 +141,48 @@ function Track(props) {
     }, []);
 
 	return (
-		<div className="playlist__item">
-      <div className="playlist__track track">
-        <div className="track__title">
-          <div className="track__title-image">
+		<PlaylistItem>
+      <PlaylistTrack className="track">
+        <TrackTitle>
+          <TrackTitleImg>
           {isLoaded ? (
-            <svg className="track__title-svg" alt="music">
+            <TrackTitleSvg alt="music">
               <use xlinkHref="img/icon/sprite.svg#icon-note"></use>
-            </svg>
+            </TrackTitleSvg>
           ) : (
             <SkeletonTheme baseColor="#313131" highlightColor="#444">
               <Skeleton variant="rectangular" width={51} height={51}/>
             </SkeletonTheme>
           )}
-          </div>
+          </TrackTitleImg>
 
           {isLoaded ? (
-            <div className="track__title-text">
-              <a className="track__title-link" href="http://">{props.trackName}
-                <span className="track__title-span">{props.trackNameSpan}</span>
-              </a>
+            <div>
+              <TrackTitleLink href="http://">{props.trackName}
+                <TrackTitleSpan>{props.trackNameSpan}</TrackTitleSpan>
+              </TrackTitleLink>
             </div>
           ) : (
             <SkeletonTheme baseColor="#313131" highlightColor="#444">
               <Skeleton variant="rectangular" width={356} height={19}/>
             </SkeletonTheme>
           )}
-        </div>
+        </TrackTitle>
 
-        
-        <div className="track__author">
+        <TrackAuthor>
         {isLoaded ? (
-          <a className="track__author-link" href="http://">{props.authorName}</a>
+          <TrackAuthorLink href="http://">{props.authorName}</TrackAuthorLink>
         ) : (
           <SkeletonTheme baseColor="#313131" highlightColor="#444">
             <Skeleton variant="rectangular" width={271} height={19}/>
           </SkeletonTheme>
         )}
-        </div>
+        </TrackAuthor>
 
         {isLoaded ? (
-          <div className="track__album">
-            <a className="track__album-link" href="http://">{props.albumName}</a>
-          </div>
+          <TrackAlbum>
+            <TrackAlbumLink href="http://">{props.albumName}</TrackAlbumLink>
+          </TrackAlbum>
         ) : (
           <SkeletonTheme baseColor="#313131" highlightColor="#444">
             <Skeleton variant="rectangular" width={305} height={19}/>
@@ -66,15 +190,15 @@ function Track(props) {
         )}
 
         {isLoaded && (
-          <div className="track__time">
-            <svg className="track__time-svg" alt="time">
+          <div>
+            <TrackTimeSvg alt="time">
               <use xlinkHref="img/icon/sprite.svg#icon-like"></use>
-            </svg>
-            <span className="track__time-text">{props.trackTime}</span>
+            </TrackTimeSvg>
+            <TrackTimeText>{props.trackTime}</TrackTimeText>
           </div>
         )}
-      </div>
-    </div>
+      </PlaylistTrack>
+    </PlaylistItem>
 	);
 }
 	
