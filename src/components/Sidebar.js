@@ -86,9 +86,9 @@ function Sidebar() {
       </SidebarPersonal>
       <SidebarBlock>
         <SidebarList>
-          <Playlist imageSrcPath="img/playlist01.png"/>
-          <Playlist imageSrcPath="img/playlist02.png"/>
-          <Playlist imageSrcPath="img/playlist03.png"/>
+          <Playlist imageSrcPath="img/playlist01.png" categoryId="1"/>
+          <Playlist imageSrcPath="img/playlist02.png" categoryId="2"/>
+          <Playlist imageSrcPath="img/playlist03.png" categoryId="3"/>
         </SidebarList>
       </SidebarBlock>
     </SidebarEl>

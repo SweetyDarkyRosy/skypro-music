@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import styled from 'styled-components';
 import 'react-loading-skeleton/dist/skeleton.css'
+import { Link } from 'react-router-dom';
 
 
 const SidebarItem = styled.div`
@@ -9,10 +10,10 @@ const SidebarItem = styled.div`
   height: 150px;
 `;
 
-const SidebarLink = styled.a`
-  width: 100%;
-	height: 100%;
-`;
+const sidebarLink = {
+  width: '100%',
+	height: '100%'
+};
 
 const SidebarImg = styled.img`
   width: 100%;
@@ -20,7 +21,7 @@ const SidebarImg = styled.img`
 `;
 
 
-function Playlist({ imageSrcPath }) {
+function Playlist({ imageSrcPath, categoryId }) {
   const [isLoaded, setLoadedState] = useState(false);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ function Playlist({ imageSrcPath }) {
 
 	return (
       <SidebarItem>
-        <SidebarLink href="#">
+        <Link to={"/category/" + categoryId} style={sidebarLink}>
         {isLoaded ? (
           <SidebarImg
             src={ imageSrcPath }
@@ -44,7 +45,7 @@ function Playlist({ imageSrcPath }) {
             <Skeleton variant="rectangular" width={250} height={150}/>
           </SkeletonTheme>
         )}
-        </SidebarLink>
+        </Link>
       </SidebarItem>
 	);
 }

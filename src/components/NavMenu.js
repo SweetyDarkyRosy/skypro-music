@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 
@@ -36,12 +37,12 @@ const MenuItem = styled.li`
   margin-bottom: 16px;
 `;
 
-const MenuLink = styled.a`
-  color: #ffffff;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-`;
+const MenuLink = {
+  color: '#ffffff',
+  fontWeight: '400',
+  fontSize: '16px',
+  lineHeight: '24px'
+};
 
 const NavBurger = styled.div`
   width: 20px;
@@ -87,13 +88,13 @@ function NavMenu() {
         <Menu className="menu">
           <MenuList>
             <MenuItem>
-              <MenuLink href="#">Главное</MenuLink>
+              <Link to={"/"} style={MenuLink}>Главное</Link>
             </MenuItem>
             <MenuItem>
-              <MenuLink href="#">Мой плейлист</MenuLink>
+              <Link to={"/favorites"} style={MenuLink}>Мой плейлист</Link>
             </MenuItem>
             <MenuItem>
-              <MenuLink href="../signin.html">Войти</MenuLink>
+              <Link to={"/login"} style={MenuLink}>Войти</Link>
             </MenuItem>
           </MenuList>
         </Menu>)

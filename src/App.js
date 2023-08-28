@@ -1,9 +1,7 @@
 import styled, { createGlobalStyle } from 'styled-components';
 import logo from './logo.svg';
-import AudioPlayer from './components/AudioPlayer'
-import Tracklist from './components/Tracklist'
-import NavMenu from './components/NavMenu'
-import Sidebar from './components/Sidebar'
+import { AppRoutes } from './routes';
+import React, { useState } from 'react';
 
 
 const GlobalStyle = createGlobalStyle`
@@ -98,39 +96,25 @@ const Container = styled.div`
   position: relative;
   background-color: #181818;
 `
-const Main = styled.main`
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-
-  -webkit-box-flex: 1;
-  -ms-flex: 1 1 auto;
-  flex: 1 1 auto;
-
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-`
 
 
 function App() {
+  const [user, setUser] = useState({ login: "" });
+
+  const onLoginButtonClick = () => {
+    console.log("LOGIN!");
+    setUser({ login: "" });
+  }
+
   return (
     <div className='App'>
       <GlobalStyle/>
-        <Wrapper>
-          <Container>
-            <Main>
-              <NavMenu/>
-              <Tracklist/>
-              <Sidebar/>
-            </Main>
-            <AudioPlayer/>
-            <footer className="footer"></footer>
-          </Container>
-        </Wrapper>
+      <Wrapper>
+        <Container>
+          <AppRoutes user={ user } onLoginButtonClick={ onLoginButtonClick }/>
+          <footer className="footer"></footer>
+        </Container>
+      </Wrapper>
     </div>
   );
 }
