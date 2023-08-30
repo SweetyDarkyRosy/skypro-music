@@ -2,6 +2,7 @@ import styled, { createGlobalStyle } from 'styled-components';
 import logo from './logo.svg';
 import { AppRoutes } from './routes';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 
 const GlobalStyle = createGlobalStyle`
@@ -99,11 +100,12 @@ const Container = styled.div`
 
 
 function App() {
-  const [user, setUser] = useState({ login: "" });
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   const onLoginButtonClick = () => {
-    console.log("LOGIN!");
     setUser({ login: "" });
+    navigate("/", { replace: true });
   }
 
   return (

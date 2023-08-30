@@ -17,7 +17,7 @@ export const AppRoutes = ({ user, onLoginButtonClick }) => {
 				<Route path="/favorites" element={<Favorites />}/>
 			</Route>
 			
-			<Route path="/login" user={ user } onLoginButtonClick={ onLoginButtonClick } element={<Login />}/>
+			<Route path="/login" element={<Login user={ user } onLoginButtonClick={ onLoginButtonClick } />}/>
 			<Route path="/register" element={<Register />}/>
 
 			<Route path="*" element={<NotFound />}/>
