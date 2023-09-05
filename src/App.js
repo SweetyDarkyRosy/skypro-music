@@ -1,5 +1,4 @@
 import styled, { createGlobalStyle } from 'styled-components';
-import logo from './logo.svg';
 import { AppRoutes } from './routes';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';

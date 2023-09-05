@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import styled from 'styled-components';
@@ -301,19 +301,10 @@ const VolumeProgressLine = styled.input`
 `;
 
 
-function AudioPlayer() {
-  const [isLoaded, setLoadedState] = useState(false);
-
-  useEffect(() => {
-      setTimeout(() => {
-          setLoadedState(true);
-        }, 5000);
-
-      return () => {}
-    }, []);
-
-  
+function AudioPlayer({ musicInfo }) {
 	return (
+  <React.Fragment>
+  {musicInfo.isShown && (
 		<Bar>
       <BarContent>
         <BarPlayerProgress/>
@@ -347,10 +338,14 @@ function AudioPlayer() {
               </PlayerButtonShuffle>
             </PlayerControls>
 
+            {musicInfo.isPlayed && (
+              <audio src={ musicInfo.src } loop autoPlay></audio>
+            )}
+
             <PlayerTrackPlay className="track-play">
               <PlayerTrackPlayContain>
                 <PlayerTrackPlayImage>
-                {isLoaded ? (
+                {musicInfo.isPlayed ? (
                   <PlayerTrackPlaySvg alt="music">
                     <use xlinkHref="img/icon/sprite.svg#icon-note"></use>
                   </PlayerTrackPlaySvg>
@@ -361,8 +356,8 @@ function AudioPlayer() {
                 )}
                 </PlayerTrackPlayImage>
                 <PlayerTrackPlayAuthor>
-                {isLoaded ? (
-                  <PlayerTrackPlayAuthorLink href="http://">Ты та...</PlayerTrackPlayAuthorLink>
+                {musicInfo.isPlayed ? (
+                  <PlayerTrackPlayAuthorLink href="http://">{ musicInfo.trackName }</PlayerTrackPlayAuthorLink>
                 ) : (
                   <SkeletonTheme baseColor="#313131" highlightColor="#444">
                     <Skeleton variant="rectangular" width={59} height={15}/>
@@ -370,8 +365,8 @@ function AudioPlayer() {
                 )}
                 </PlayerTrackPlayAuthor>
                 <PlayerTrackPlayAlbum>
-                {isLoaded ? (
-                  <PlayerTrackPlayAlbumLink href="http://">Баста</PlayerTrackPlayAlbumLink>
+                {musicInfo.isPlayed ? (
+                  <PlayerTrackPlayAlbumLink href="http://">{ musicInfo.authorName }</PlayerTrackPlayAlbumLink>
                 ) : (
                   <SkeletonTheme baseColor="#313131" highlightColor="#444">
                     <Skeleton variant="rectangular" width={59} height={15}/>
@@ -415,7 +410,8 @@ function AudioPlayer() {
         </BarPlayerBlock>
       </BarContent>
     </Bar>
-	);
+  )}
+  </React.Fragment>);
 }
 
 export default AudioPlayer;

@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import Track from './Track';
 import SearchBar from './SearchBar';
 import Filter from './Filter';
+import { getTrackList } from '../api'
 
 
 const TracklistEl = styled.div`
@@ -131,10 +132,47 @@ const TracklistFilterButton = styled.div`
 `
 
 
-function Tracklist() {
-  const [isAuthorFilterLoaded, setAuthorFilterLoadedState] = useState(false);
+function Tracklist({ onPlayAudio }) {
+  const [isAuthorFilterVisible, setAuthorFilterLoadedState] = useState(false);
 
-  const toggleAuthorFilterVisibility = () => setAuthorFilterLoadedState(!isAuthorFilterLoaded);
+  const toggleAuthorFilterVisibility = () => setAuthorFilterLoadedState(!isAuthorFilterVisible);
+
+  const [trackList, setTrackList] = useState([
+      { trackName: "Track Name", authorName: "Author Name", albumName: "Album Name", trackDuration: "00:00" }
+    ]);
+
+  const [isTrackListLoadingSuccessful, setTrackListLoadingSuccessStatus] = useState(true);
+  const [isTrackListLoaded, setIfTrackListLoaded] = useState(false);
+
+
+  getTrackList().then((data) =>
+    {
+      const trackListProcessed = [];
+
+      data.forEach((track) => {
+          const durationStr = (Math.floor(track.duration_in_seconds / 60)) + ":" + (track.duration_in_seconds % 60);
+
+          const trackAdded = {
+            trackId: track.id,
+            trackName: track.name,
+            authorName: track.author,
+            albumName: track.author,
+            trackDuration: durationStr
+          };
+
+          trackListProcessed.push(trackAdded);
+          setIfTrackListLoaded(true);
+        });
+
+      setTrackList(trackListProcessed);
+
+      setTrackListLoadingSuccessStatus(true);
+    }).catch((error) => {
+        console.log(" - Error: Could not load a list of tracks available");
+
+        setTrackListLoadingSuccessStatus(false);
+      });
+
 
 	return (
 		<TracklistEl className="centerblock">
@@ -145,7 +183,7 @@ function Tracklist() {
         <TracklistFilterButton className="button-author _btn-text" onClick={toggleAuthorFilterVisibility}>
           исполнителю
 
-        {isAuthorFilterLoaded && (
+        {isAuthorFilterVisible && (
           <Filter/>
         )}
         </TracklistFilterButton>
@@ -156,30 +194,31 @@ function Tracklist() {
           жанру
         </TracklistFilterButton>
       </TracklistFilterBlock>
-      <TracklistContent>
-        <TracklistContentTitleBlock className="playlist-title">
-          <TracklistContentTitleBlockColumnTrack>Трек</TracklistContentTitleBlockColumnTrack>
-          <TracklistContentTitleBlockColumnAuthor>ИСПОЛНИТЕЛЬ</TracklistContentTitleBlockColumnAuthor>
-          <TracklistContentTitleBlockColumnAlbum>АЛЬБОМ</TracklistContentTitleBlockColumnAlbum>
-          <TracklistContentTitleBlockColumnTime>
-            <TracklistContentTitleBlockSvg alt="time">
-              <use xlinkHref="img/icon/sprite.svg#icon-watch"></use>
-            </TracklistContentTitleBlockSvg>
-          </TracklistContentTitleBlockColumnTime>
-        </TracklistContentTitleBlock>
-        <TracklistContentPlaylist className="playlist">
-          <Track trackName="Guilt" authorName="Nero" albumName="Welcome Reality" trackTime="4:44"/>
-          <Track trackName="Elektro" authorName="Dynoro, Outwork, Mr. Gee" albumName="Elektro" trackTime="2:22"/>
-          <Track trackName="I’m Fire" authorName="Ali Bakgor" albumName="I’m Fire" trackTime="2:22"/>
-          <Track trackName="Non Stop" trackNameSpan="(Remix)" authorName="Стоункат, Psychopath" albumName="Non Stop" trackTime="4:12"/>
-          <Track trackName="Run Run" trackNameSpan="(feat. AR/CO)" authorName="Jaded, Will Clarke, AR/CO" albumName="Run Run" trackTime="2:54"/>
-          <Track trackName="Eyes on Fire" trackNameSpan="(Zeds Dead Remix)" authorName="Blue Foundation, Zeds Dead" albumName="Eyes on Fire" trackTime="5:20"/>
-          <Track trackName="Mucho Bien" trackNameSpan="(Hi Profile Remix)" authorName="HYBIT, Mr. Black, Offer Nissim, Hi Profile" albumName="Mucho Bien" trackTime="3:41"/>
-          <Track trackName="Knives n Cherries" authorName="minthaze" albumName="Captivating" trackTime="1:48"/>
-          <Track trackName="How Deep Is Your Love" authorName="Calvin Harris, Disciples" albumName="How Deep Is Your Love" trackTime="3:32"/>
-          <Track trackName="Morena" authorName="Tom Boxer" albumName="Soundz Made in Romania" trackTime="3:36"/>
-        </TracklistContentPlaylist>
-      </TracklistContent>
+      {isTrackListLoadingSuccessful && (
+        <TracklistContent>
+          <TracklistContentTitleBlock className="playlist-title">
+            <TracklistContentTitleBlockColumnTrack>Трек</TracklistContentTitleBlockColumnTrack>
+            <TracklistContentTitleBlockColumnAuthor>ИСПОЛНИТЕЛЬ</TracklistContentTitleBlockColumnAuthor>
+            <TracklistContentTitleBlockColumnAlbum>АЛЬБОМ</TracklistContentTitleBlockColumnAlbum>
+            <TracklistContentTitleBlockColumnTime>
+              <TracklistContentTitleBlockSvg alt="time">
+                <use xlinkHref="img/icon/sprite.svg#icon-watch"></use>
+              </TracklistContentTitleBlockSvg>
+            </TracklistContentTitleBlockColumnTime>
+          </TracklistContentTitleBlock>
+          <TracklistContentPlaylist className="playlist">
+          {
+            trackList.map((track) => {
+                return <Track trackId={ track.trackId } onPlayAudio={ onPlayAudio } isTrackLoaded={ isTrackListLoaded } trackName={ track.trackName }
+                  authorName={ track.authorName } albumName={ track.albumName } trackTime={ track.trackDuration }/>;
+              })
+          }
+          </TracklistContentPlaylist>
+        </TracklistContent>
+      )}
+      {!isTrackListLoadingSuccessful && (
+        <a>Не удалось загрузить плейлист, попробуйте позже</a>
+      )}
     </TracklistEl>
 	);
 }
