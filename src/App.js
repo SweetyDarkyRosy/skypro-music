@@ -1,7 +1,6 @@
 import styled, { createGlobalStyle } from 'styled-components';
 import { AppRoutes } from './routes';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { AuthProvider } from './authContext';
 
 
 const GlobalStyle = createGlobalStyle`
@@ -98,21 +97,14 @@ const Container = styled.div`
 
 
 function App() {
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
-
-  const onLoginButtonClick = () => {
-    setUser({ login: "" });
-    navigate("/", { replace: true });
-  }
-
   return (
     <div className='App'>
       <GlobalStyle/>
       <Wrapper>
         <Container>
-          <AppRoutes user={ user } onLoginButtonClick={ onLoginButtonClick }/>
-          <footer className="footer"></footer>
+          <AuthProvider>
+            <AppRoutes/>
+          </AuthProvider>
         </Container>
       </Wrapper>
     </div>

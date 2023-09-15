@@ -1,7 +1,10 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { useAuthContext } from '../authContext'
 
 export const PrivateRoute = ({ redirectPath = "/login", isAllowed }) => {
-	if (isAllowed === false)
+	const authContext = useAuthContext();
+
+	if (authContext.userData === null)
 	{
 		return <Navigate to={ redirectPath } replace={true} />
 	}

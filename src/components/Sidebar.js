@@ -1,5 +1,6 @@
 import Playlist from './Playlist';
 import styled from 'styled-components';
+import { useAuthContext } from '../authContext'
 
 
 const SidebarEl = styled.div`
@@ -74,10 +75,12 @@ const SidebarBlock = styled.div`
 
 
 function Sidebar() {
+  const authContext = useAuthContext();
+
 	return (
 		<SidebarEl className="sidebar">
       <SidebarPersonal>
-        <SidebarPersonalName>Sergey.Ivanov</SidebarPersonalName>
+        <SidebarPersonalName>{ authContext.userData.username }</SidebarPersonalName>
         <SidebarIcon>
           <svg alt="logout">
             <use xlinkHref="img/icon/sprite.svg#logout"></use>

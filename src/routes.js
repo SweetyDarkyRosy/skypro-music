@@ -8,16 +8,16 @@ import { Favorites } from "./pages/Favorites";
 import { PrivateRoute } from "./components/PrivateRoute";
 
 
-export const AppRoutes = ({ user, onLoginButtonClick }) => {
+export const AppRoutes = () => {
 	return (
 		<Routes>
-			<Route element={<PrivateRoute isAllowed={ Boolean(user) } />}>
+			<Route element={<PrivateRoute />}>
 				<Route path="/" element={<MainPage />}/>
 				<Route path="/category/:id" element={<Category />}/>
 				<Route path="/favorites" element={<Favorites />}/>
 			</Route>
 			
-			<Route path="/login" element={<Login user={ user } onLoginButtonClick={ onLoginButtonClick } />}/>
+			<Route path="/login" element={<Login />}/>
 			<Route path="/register" element={<Register />}/>
 
 			<Route path="*" element={<NotFound />}/>
