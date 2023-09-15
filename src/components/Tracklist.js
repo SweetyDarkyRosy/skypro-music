@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Track from './Track';
 import SearchBar from './SearchBar';
@@ -150,41 +150,35 @@ function Tracklist({ onPlayAudio }) {
   const [isTrackListLoadingSuccessful, setTrackListLoadingSuccessStatus] = useState(false);
   const [isTrackListLoaded, setIfTrackListLoaded] = useState(false);
 
-  getTrackList().then((data) =>
-    {
-      const trackListProcessed = [];
+  useEffect(()=>{
+        getTrackList().then((data) =>
+        {
+          const trackListProcessed = [];
 
-      data.forEach((track) => {
-          const durationStr = (Math.floor(track.duration_in_seconds / 60)) + ":" + (track.duration_in_seconds % 60);
+          data.forEach((track) => {
+              const durationStr = (Math.floor(track.duration_in_seconds / 60)) + ":" + (track.duration_in_seconds % 60);
 
-          const trackAdded = {
-            trackId: track.id,
-            trackName: track.name,
-            authorName: track.author,
-            albumName: track.author,
-            trackDuration: durationStr
-          };
+              const trackAdded = {
+                trackId: track.id,
+                trackName: track.name,
+                authorName: track.author,
+                albumName: track.author,
+                trackDuration: durationStr
+              };
 
-          trackListProcessed.push(trackAdded);
-        });
+              trackListProcessed.push(trackAdded);
+            });
 
-      setTrackList(trackListProcessed);
-      setIfTrackListLoaded(true);
+          setTrackList(trackListProcessed);
+          setIfTrackListLoaded(true);
 
-      setTrackListLoadingSuccessStatus(true);
-    }).catch((error) => {
-        console.log(" - Error: Could not load a list of tracks available");
+          setTrackListLoadingSuccessStatus(true);
+        }).catch((error) => {
+            console.log(" - Error: Could not load a list of tracks available");
 
-        setTrackListLoadingSuccessStatus(false);
-      });
-
-  // TEMP!
-  /*
-  useEffect(() => {
-    setIfTrackListLoaded(true);
-    setTrackListLoadingSuccessStatus(true);
-  });
-  */
+            setTrackListLoadingSuccessStatus(false);
+          });
+    }, [])
 
 	return (
 		<TracklistEl className="centerblock">

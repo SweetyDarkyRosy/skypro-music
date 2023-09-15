@@ -44,9 +44,6 @@ export const MainPage = () => {
     }).catch((error) => {
         console.log(" - Error: Could not load a track");
       });
-
-    // TEMP!
-    //setMusicInfo({ src: trackId, trackName: "NAME", authorName: "AUTHOR", isReady: true });
   }
 
 

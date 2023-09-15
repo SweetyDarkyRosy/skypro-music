@@ -23,6 +23,10 @@ const PlaylistTrack = styled.div`
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+
+  &:hover {
+    background: #222222;
+  }
 `;
 
 const TrackTitle = styled.div`
@@ -129,14 +133,16 @@ const TrackTimeText = styled.span`
 
 
 function Track(props) {
-  const playTrack = () => {
+  const playTrack = (event) => {
+    event.preventDefault();
+
     const onPlayAudio = props.onPlayAudio;
     onPlayAudio(props.trackId);
   }
 
 	return (
 		<PlaylistItem>
-      <PlaylistTrack className="track">
+      <PlaylistTrack className="track" onClick={playTrack}>
         <TrackTitle>
           <TrackTitleImg>
           {(props.isTrackLoaded) ? (
@@ -152,7 +158,7 @@ function Track(props) {
 
           {(props.isTrackLoaded) ? (
             <div>
-              <TrackTitleLink onClick={playTrack} href="http://">{ props.trackName }
+              <TrackTitleLink href="http://">{ props.trackName }
                 <TrackTitleSpan>{ props.trackNameSpan }</TrackTitleSpan>
               </TrackTitleLink>
             </div>
