@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Track from './Track';
 import SearchBar from './SearchBar';
@@ -139,11 +139,16 @@ function Tracklist({ onPlayAudio }) {
 
   const [trackList, setTrackList] = useState([
       { trackName: "Track Name", authorName: "Author Name", albumName: "Album Name", trackDuration: "00:00" }
+      
+      // TEMP!
+      /*
+      { trackName: "Track Name", authorName: "Author Name", albumName: "Album Name", trackDuration: "00:00", trackId: 'http://docs.google.com/uc?export=open&id=1PA7GW7OUhzeoF5evbZxX2wrIt49SdII7' },
+      { trackName: "Track Name", authorName: "Author Name", albumName: "Album Name", trackDuration: "00:00", trackId: 'http://docs.google.com/uc?export=open&id=1XCX5cajM5cT9g96PvtAoWmYEWu1_P1KY' }
+      */
     ]);
 
-  const [isTrackListLoadingSuccessful, setTrackListLoadingSuccessStatus] = useState(true);
+  const [isTrackListLoadingSuccessful, setTrackListLoadingSuccessStatus] = useState(false);
   const [isTrackListLoaded, setIfTrackListLoaded] = useState(false);
-
 
   getTrackList().then((data) =>
     {
@@ -161,10 +166,10 @@ function Tracklist({ onPlayAudio }) {
           };
 
           trackListProcessed.push(trackAdded);
-          setIfTrackListLoaded(true);
         });
 
       setTrackList(trackListProcessed);
+      setIfTrackListLoaded(true);
 
       setTrackListLoadingSuccessStatus(true);
     }).catch((error) => {
@@ -173,6 +178,13 @@ function Tracklist({ onPlayAudio }) {
         setTrackListLoadingSuccessStatus(false);
       });
 
+  // TEMP!
+  /*
+  useEffect(() => {
+    setIfTrackListLoaded(true);
+    setTrackListLoadingSuccessStatus(true);
+  });
+  */
 
 	return (
 		<TracklistEl className="centerblock">
@@ -217,7 +229,7 @@ function Tracklist({ onPlayAudio }) {
         </TracklistContent>
       )}
       {!isTrackListLoadingSuccessful && (
-        <a>Не удалось загрузить плейлист, попробуйте позже</a>
+        <p>Не удалось загрузить плейлист, попробуйте позже</p>
       )}
     </TracklistEl>
 	);

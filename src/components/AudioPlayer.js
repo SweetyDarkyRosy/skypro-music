@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import styled from 'styled-components';
@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 const Bar = styled.div`
   position: absolute;
+  z-order: 100;
 	bottom: 0;
 	left: 0;
 	width: 100%;
@@ -26,6 +27,10 @@ const BarPlayerProgress = styled.div`
   width: 100%;
   height: 5px;
   background: #2e2e2e;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const BarPlayerBlock = styled.div`
@@ -301,13 +306,75 @@ const VolumeProgressLine = styled.input`
 `;
 
 
-function AudioPlayer({ musicInfo }) {
+function AudioPlayer(props) {
+  const audioComponentRef = useRef(null);
+  const progressWalkerRef = useRef(null);
+
+  const [ currAudioProgress, setCurrAudioProgress ] = useState(0);
+
+  const BarPlayerProgressWalker = {
+    height: '5px',
+    width: currAudioProgress + '%',
+    background: '#B672FF'
+  };
+
+
+  const onPlayMusic = () => {
+    if (audioComponentRef.current.paused === true)
+    {
+      audioComponentRef.current.play();
+    }
+    else
+    {
+      audioComponentRef.current.pause();
+    }
+  }
+
+  const onToggleLooping = () => {
+    if (audioComponentRef.current.loop === true)
+    {
+      audioComponentRef.current.loop = false;
+    }
+    else
+    {
+      audioComponentRef.current.loop = true;
+    }
+  }
+
+  const onVolumeChange = (event) => {
+    audioComponentRef.current.volume = event.target.value / 100;
+  }
+
+  const onProgressBarClick = (event) => {
+    const barBoundingClientRect = event.target.getBoundingClientRect();
+
+    audioComponentRef.current.currentTime = Math.round(audioComponentRef.current.duration *
+      (event.clientX - barBoundingClientRect.left) / (barBoundingClientRect.right - barBoundingClientRect.left));
+  }
+
+  const restartMusicPlaying = (musicURL) => {
+    audioComponentRef.current.pause();
+    audioComponentRef.current.currentTime = 0;
+    audioComponentRef.current.src = musicURL;
+    audioComponentRef.current.play();
+  }
+
+  const updateMusicProgress = () => {
+    setCurrAudioProgress(Math.round(audioComponentRef.current.currentTime / audioComponentRef.current.duration * 100));
+  }
+
+  props.childRef.current = {
+    restartMusicPlaying: restartMusicPlaying
+  }
+
+
 	return (
   <React.Fragment>
-  {musicInfo.isShown && (
 		<Bar>
       <BarContent>
-        <BarPlayerProgress/>
+        <BarPlayerProgress onClick={ onProgressBarClick }>
+          <div style={ BarPlayerProgressWalker } ref={ progressWalkerRef }/>
+        </BarPlayerProgress>
         <BarPlayerBlock>
           <Player className="player">
             <PlayerControls>
@@ -317,7 +384,7 @@ function AudioPlayer({ musicInfo }) {
                 </PlayerButtonPrevSvg>
               </PlayerButtonPrev>
               <PlayerButtonPlay className="_btn">
-                <PlayerButtonPlaySvg alt="play">
+                <PlayerButtonPlaySvg alt="play" onClick={ onPlayMusic }>
                   <use xlinkHref="img/icon/sprite.svg#icon-play"></use>
                 </PlayerButtonPlaySvg>
               </PlayerButtonPlay>
@@ -327,7 +394,7 @@ function AudioPlayer({ musicInfo }) {
                 </PlayerButtonNextSvg>
               </PlayerButtonNext>
               <PlayerButtonRepeat className="_btn-icon">
-                <PlayerButtonRepeatSvg alt="repeat">
+                <PlayerButtonRepeatSvg alt="repeat" onClick={ onToggleLooping }>
                   <use xlinkHref="img/icon/sprite.svg#icon-repeat"></use>
                 </PlayerButtonRepeatSvg>
               </PlayerButtonRepeat>
@@ -338,14 +405,12 @@ function AudioPlayer({ musicInfo }) {
               </PlayerButtonShuffle>
             </PlayerControls>
 
-            {musicInfo.isPlayed && (
-              <audio src={ musicInfo.src } loop autoPlay></audio>
-            )}
+            <audio ref={ audioComponentRef } onTimeUpdate={ updateMusicProgress }></audio>
 
             <PlayerTrackPlay className="track-play">
               <PlayerTrackPlayContain>
                 <PlayerTrackPlayImage>
-                {musicInfo.isPlayed ? (
+                {props.musicInfo.isReady ? (
                   <PlayerTrackPlaySvg alt="music">
                     <use xlinkHref="img/icon/sprite.svg#icon-note"></use>
                   </PlayerTrackPlaySvg>
@@ -356,8 +421,8 @@ function AudioPlayer({ musicInfo }) {
                 )}
                 </PlayerTrackPlayImage>
                 <PlayerTrackPlayAuthor>
-                {musicInfo.isPlayed ? (
-                  <PlayerTrackPlayAuthorLink href="http://">{ musicInfo.trackName }</PlayerTrackPlayAuthorLink>
+                {props.musicInfo.isReady ? (
+                  <PlayerTrackPlayAuthorLink href="http://">{ props.musicInfo.trackName }</PlayerTrackPlayAuthorLink>
                 ) : (
                   <SkeletonTheme baseColor="#313131" highlightColor="#444">
                     <Skeleton variant="rectangular" width={59} height={15}/>
@@ -365,8 +430,8 @@ function AudioPlayer({ musicInfo }) {
                 )}
                 </PlayerTrackPlayAuthor>
                 <PlayerTrackPlayAlbum>
-                {musicInfo.isPlayed ? (
-                  <PlayerTrackPlayAlbumLink href="http://">{ musicInfo.authorName }</PlayerTrackPlayAlbumLink>
+                {props.musicInfo.isReady ? (
+                  <PlayerTrackPlayAlbumLink href="http://">{ props.musicInfo.authorName }</PlayerTrackPlayAlbumLink>
                 ) : (
                   <SkeletonTheme baseColor="#313131" highlightColor="#444">
                     <Skeleton variant="rectangular" width={59} height={15}/>
@@ -403,6 +468,7 @@ function AudioPlayer({ musicInfo }) {
                   className="_btn"
                   type="range"
                   name="range"
+                  onChange={ onVolumeChange }
                 />
               </VolumeProgress>
             </VolumeContent>
@@ -410,7 +476,6 @@ function AudioPlayer({ musicInfo }) {
         </BarPlayerBlock>
       </BarContent>
     </Bar>
-  )}
   </React.Fragment>);
 }
 

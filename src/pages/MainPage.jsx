@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
 import AudioPlayer from '../components/AudioPlayer'
 import Tracklist from '../components/Tracklist'
 import NavMenu from '../components/NavMenu'
 import Sidebar from '../components/Sidebar'
-import { getTrackSrcURL } from '../api'
+import { getTrackSrcURL } from '../api';
 
 
 const MainBlock = styled.main`
@@ -27,20 +27,39 @@ const MainBlock = styled.main`
 
 
 export const MainPage = () => {
-  const [musicInfo, setMusicInfo] = useState({ isShown: false, isPlayed: false, src: "", trackName: "", authorName: "" });
+  const audioPlayerComponentRef = useRef(null);
+
+  const [musicInfo, setMusicInfo] = useState({ src: "", trackName: "", authorName: "", isReady: false });
+
+  const [isAudioPlayerShown, setIfAudioPlayerShown] = useState(false);
 
   const onPlayAudio = (trackId) => {
-    setMusicInfo({ isShown: true, isPlayed: false, src: "", trackName: "", authorName: "" });
+    setIfAudioPlayerShown(true);
 
     getTrackSrcURL(trackId).then((data) =>
     {
       console.log(data);
 
-      setMusicInfo({ isShown: true, isPlayed: true, src: data.track_file, trackName: data.name, authorName: data.author  });
+      setMusicInfo({ src: data.track_file, trackName: data.name, authorName: data.author, isReady: true });
     }).catch((error) => {
         console.log(" - Error: Could not load a track");
       });
+
+    // TEMP!
+    //setMusicInfo({ src: trackId, trackName: "NAME", authorName: "AUTHOR", isReady: true });
   }
+
+
+  useEffect(() => {
+      if (isAudioPlayerShown === true)
+      {
+        if (musicInfo.src !== "")
+        {
+          audioPlayerComponentRef.current.restartMusicPlaying(musicInfo.src);
+        }
+      }
+    })
+
 
 	return (
 		<React.Fragment>
@@ -49,7 +68,9 @@ export const MainPage = () => {
         <Tracklist onPlayAudio={ onPlayAudio } />
         <Sidebar/>
       </MainBlock>
-      <AudioPlayer musicInfo={ musicInfo } />
+      {isAudioPlayerShown && (
+        <AudioPlayer childRef={ audioPlayerComponentRef } musicInfo={ musicInfo } />
+      )}
 		</React.Fragment>
 	);
 };

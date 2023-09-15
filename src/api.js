@@ -1,4 +1,4 @@
-const apiAddr = "https://painassasin.online/catalog/";
+const apiAddr = "https://skypro-music-api.skyeng.tech/catalog/";
 
 
 export async function getTrackList() {
