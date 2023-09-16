@@ -1,6 +1,8 @@
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import styled from 'styled-components';
+import { setCurrTrack } from '../store/actions'
+import { useDispatch } from 'react-redux';
 
 
 const PlaylistItem = styled.div`
@@ -133,12 +135,15 @@ const TrackTimeText = styled.span`
 
 
 function Track(props) {
+  const dispatch = useDispatch();
+
+
   const playTrack = (event) => {
     event.preventDefault();
 
-    const onPlayAudio = props.onPlayAudio;
-    onPlayAudio(props.trackId);
+    dispatch(setCurrTrack(props.trackId));
   }
+
 
 	return (
 		<PlaylistItem>

@@ -1,11 +1,10 @@
-import React, { useEffect, useRef } from 'react';
-import { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import AudioPlayer from '../components/AudioPlayer'
 import Tracklist from '../components/Tracklist'
 import NavMenu from '../components/NavMenu'
 import Sidebar from '../components/Sidebar'
-import { getTrackSrcURL } from '../api';
+import { useSelector } from 'react-redux';
 
 
 const MainBlock = styled.main`
@@ -27,46 +26,18 @@ const MainBlock = styled.main`
 
 
 export const MainPage = () => {
-  const audioPlayerComponentRef = useRef(null);
-
-  const [musicInfo, setMusicInfo] = useState({ src: "", trackName: "", authorName: "", isReady: false });
-
-  const [isAudioPlayerShown, setIfAudioPlayerShown] = useState(false);
-
-  const onPlayAudio = (trackId) => {
-    setIfAudioPlayerShown(true);
-
-    getTrackSrcURL(trackId).then((data) =>
-    {
-      console.log(data);
-
-      setMusicInfo({ src: data.track_file, trackName: data.name, authorName: data.author, isReady: true });
-    }).catch((error) => {
-        console.log(" - Error: Could not load a track");
-      });
-  }
-
-
-  useEffect(() => {
-      if (isAudioPlayerShown === true)
-      {
-        if (musicInfo.src !== "")
-        {
-          audioPlayerComponentRef.current.restartMusicPlaying(musicInfo.src);
-        }
-      }
-    })
+  const currentTrack = useSelector((state) => state.currentTrack);
 
 
 	return (
 		<React.Fragment>
 			<MainBlock>
         <NavMenu/>
-        <Tracklist onPlayAudio={ onPlayAudio } />
+        <Tracklist/>
         <Sidebar/>
       </MainBlock>
-      {isAudioPlayerShown && (
-        <AudioPlayer childRef={ audioPlayerComponentRef } musicInfo={ musicInfo } />
+      {currentTrack && (
+        <AudioPlayer/>
       )}
 		</React.Fragment>
 	);

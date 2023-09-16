@@ -4,6 +4,8 @@ import Track from './Track';
 import SearchBar from './SearchBar';
 import Filter from './Filter';
 import { getTrackList } from '../api'
+import { setPlaylist } from '../store/actions';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 const TracklistEl = styled.div`
@@ -132,23 +134,23 @@ const TracklistFilterButton = styled.div`
 `
 
 
-function Tracklist({ onPlayAudio }) {
+function Tracklist() {
   const [isAuthorFilterVisible, setAuthorFilterLoadedState] = useState(false);
 
   const toggleAuthorFilterVisibility = () => setAuthorFilterLoadedState(!isAuthorFilterVisible);
 
+  /*
   const [trackList, setTrackList] = useState([
       { trackName: "Track Name", authorName: "Author Name", albumName: "Album Name", trackDuration: "00:00" }
-      
-      // TEMP!
-      /*
-      { trackName: "Track Name", authorName: "Author Name", albumName: "Album Name", trackDuration: "00:00", trackId: 'http://docs.google.com/uc?export=open&id=1PA7GW7OUhzeoF5evbZxX2wrIt49SdII7' },
-      { trackName: "Track Name", authorName: "Author Name", albumName: "Album Name", trackDuration: "00:00", trackId: 'http://docs.google.com/uc?export=open&id=1XCX5cajM5cT9g96PvtAoWmYEWu1_P1KY' }
-      */
     ]);
+  */
 
-  const [isTrackListLoadingSuccessful, setTrackListLoadingSuccessStatus] = useState(false);
+  const [isTrackListLoadingSuccessful, setTrackListLoadingSuccessStatus] = useState(true);
   const [isTrackListLoaded, setIfTrackListLoaded] = useState(false);
+
+  const playlist = useSelector((state) => state.playlist);
+  const dispatch = useDispatch();
+
 
   useEffect(()=>{
         getTrackList().then((data) =>
@@ -169,12 +171,13 @@ function Tracklist({ onPlayAudio }) {
               trackListProcessed.push(trackAdded);
             });
 
-          setTrackList(trackListProcessed);
-          setIfTrackListLoaded(true);
+          //setTrackList(trackListProcessed);
+          dispatch(setPlaylist(trackListProcessed));
 
+          setIfTrackListLoaded(true);
           setTrackListLoadingSuccessStatus(true);
         }).catch((error) => {
-            console.log(" - Error: Could not load a list of tracks available");
+            console.error(" - Error: Could not load a list of tracks available");
 
             setTrackListLoadingSuccessStatus(false);
           });
@@ -214,8 +217,15 @@ function Tracklist({ onPlayAudio }) {
           </TracklistContentTitleBlock>
           <TracklistContentPlaylist className="playlist">
           {
+            /*
             trackList.map((track) => {
                 return <Track trackId={ track.trackId } onPlayAudio={ onPlayAudio } isTrackLoaded={ isTrackListLoaded } trackName={ track.trackName }
+                  authorName={ track.authorName } albumName={ track.albumName } trackTime={ track.trackDuration }/>;
+              })
+            */
+
+            playlist.map((track) => {
+                return <Track trackId={ track.trackId } isTrackLoaded={ isTrackListLoaded } trackName={ track.trackName }
                   authorName={ track.authorName } albumName={ track.albumName } trackTime={ track.trackDuration }/>;
               })
           }

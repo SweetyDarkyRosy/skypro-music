@@ -1,7 +1,10 @@
 import React, { useRef, useState } from 'react';
+import { useEffect } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { setIfShuffled, setNextTrack, setPrevTrack, generateShuffledPlaylist } from '../store/actions';
 
 
 const Bar = styled.div`
@@ -306,11 +309,20 @@ const VolumeProgressLine = styled.input`
 `;
 
 
-function AudioPlayer(props) {
+function AudioPlayer() {
   const audioComponentRef = useRef(null);
   const progressWalkerRef = useRef(null);
 
   const [ currAudioProgress, setCurrAudioProgress ] = useState(0);
+  const [ trackData, setTrackData ] = useState({ name: "", author: "" });
+  const [ readyToPlay, setReadyToPlay ] = useState(false);
+
+  const track = useSelector((state) => state.currentTrack);
+  const playlist = useSelector((state) => state.playlist);
+  const isShuffled = useSelector((state) => state.isShuffled);
+  const shuffledPlaylist = useSelector((state) => state.shuffledPlaylist);
+  const dispatch = useDispatch();
+
 
   const BarPlayerProgressWalker = {
     height: '5px',
@@ -319,7 +331,7 @@ function AudioPlayer(props) {
   };
 
 
-  const onPlayMusic = () => {
+  const onPlayMusicButtonClick = () => {
     if (audioComponentRef.current.paused === true)
     {
       audioComponentRef.current.play();
@@ -330,7 +342,7 @@ function AudioPlayer(props) {
     }
   }
 
-  const onToggleLooping = () => {
+  const onToggleLoopingButtonClick = () => {
     if (audioComponentRef.current.loop === true)
     {
       audioComponentRef.current.loop = false;
@@ -338,6 +350,18 @@ function AudioPlayer(props) {
     else
     {
       audioComponentRef.current.loop = true;
+    }
+  }
+
+  const onToggleShuffledButtonClick = () => {
+    if (isShuffled === true)
+    {
+      dispatch(setIfShuffled(false));
+    }
+    else
+    {
+      dispatch(setIfShuffled(true));
+      dispatch(generateShuffledPlaylist(playlist));
     }
   }
 
@@ -352,20 +376,58 @@ function AudioPlayer(props) {
       (event.clientX - barBoundingClientRect.left) / (barBoundingClientRect.right - barBoundingClientRect.left));
   }
 
-  const restartMusicPlaying = (musicURL) => {
-    audioComponentRef.current.pause();
-    audioComponentRef.current.currentTime = 0;
-    audioComponentRef.current.src = musicURL;
-    audioComponentRef.current.play();
-  }
-
-  const updateMusicProgress = () => {
+  const updateTrackProgress = () => {
     setCurrAudioProgress(Math.round(audioComponentRef.current.currentTime / audioComponentRef.current.duration * 100));
   }
 
-  props.childRef.current = {
-    restartMusicPlaying: restartMusicPlaying
+  const onPrevTrackButtonClick = () => {
+    if (isShuffled === true)
+    {
+      dispatch(setPrevTrack(track.id, shuffledPlaylist));
+    }
+    else
+    {
+      dispatch(setPrevTrack(track.id, playlist));
+    }
   }
+
+  const onNextTrackButtonClick = () => {
+    if (isShuffled === true)
+    {
+      dispatch(setNextTrack(track.id, shuffledPlaylist));
+    }
+    else
+    {
+      dispatch(setNextTrack(track.id, playlist));
+    }
+  }
+
+  const onTrackEnded = () => {
+    onPrevTrackButtonClick();
+  }
+
+  useEffect(() => {
+    audioComponentRef.current.pause();
+
+    setReadyToPlay(false);
+
+    setTrackData({ name: track.name, author: track.author })
+
+    console.log("CHECK IT OUT!");
+    audioComponentRef.current.currentTime = 0;
+    audioComponentRef.current.src = track.url;
+
+    const handleCanPlayThrough = () => {
+      audioComponentRef.current.play();
+      setReadyToPlay(true);
+    }
+ 
+    audioComponentRef.current.addEventListener("loadstart", handleCanPlayThrough);
+
+    return () => {
+      audioComponentRef.current.removeEventListener("loadstart", handleCanPlayThrough);
+    };
+  }, [track]);
 
 
 	return (
@@ -379,38 +441,38 @@ function AudioPlayer(props) {
           <Player className="player">
             <PlayerControls>
               <PlayerButtonPrev>
-                <PlayerButtonPrevSvg alt="prev">
+                <PlayerButtonPrevSvg alt="prev" onClick={ onPrevTrackButtonClick }>
                   <use xlinkHref="img/icon/sprite.svg#icon-prev"></use>
                 </PlayerButtonPrevSvg>
               </PlayerButtonPrev>
               <PlayerButtonPlay className="_btn">
-                <PlayerButtonPlaySvg alt="play" onClick={ onPlayMusic }>
+                <PlayerButtonPlaySvg alt="play" onClick={ onPlayMusicButtonClick }>
                   <use xlinkHref="img/icon/sprite.svg#icon-play"></use>
                 </PlayerButtonPlaySvg>
               </PlayerButtonPlay>
               <PlayerButtonNext>
-                <PlayerButtonNextSvg alt="next">
+                <PlayerButtonNextSvg alt="next" onClick={ onNextTrackButtonClick }>
                   <use xlinkHref="img/icon/sprite.svg#icon-next"></use>
                 </PlayerButtonNextSvg>
               </PlayerButtonNext>
               <PlayerButtonRepeat className="_btn-icon">
-                <PlayerButtonRepeatSvg alt="repeat" onClick={ onToggleLooping }>
+                <PlayerButtonRepeatSvg alt="repeat" onClick={ onToggleLoopingButtonClick }>
                   <use xlinkHref="img/icon/sprite.svg#icon-repeat"></use>
                 </PlayerButtonRepeatSvg>
               </PlayerButtonRepeat>
               <PlayerButtonShuffle className="_btn-icon">
-                <PlayerButtonShuffleSvg alt="shuffle">
+                <PlayerButtonShuffleSvg alt="shuffle" onClick={ onToggleShuffledButtonClick }>
                   <use xlinkHref="img/icon/sprite.svg#icon-shuffle"></use>
                 </PlayerButtonShuffleSvg>
               </PlayerButtonShuffle>
             </PlayerControls>
 
-            <audio ref={ audioComponentRef } onTimeUpdate={ updateMusicProgress }></audio>
+            <audio ref={ audioComponentRef } onTimeUpdate={ updateTrackProgress } onEnded={ onTrackEnded }></audio>
 
             <PlayerTrackPlay className="track-play">
               <PlayerTrackPlayContain>
                 <PlayerTrackPlayImage>
-                {props.musicInfo.isReady ? (
+                {readyToPlay ? (
                   <PlayerTrackPlaySvg alt="music">
                     <use xlinkHref="img/icon/sprite.svg#icon-note"></use>
                   </PlayerTrackPlaySvg>
@@ -421,8 +483,8 @@ function AudioPlayer(props) {
                 )}
                 </PlayerTrackPlayImage>
                 <PlayerTrackPlayAuthor>
-                {props.musicInfo.isReady ? (
-                  <PlayerTrackPlayAuthorLink href="http://">{ props.musicInfo.trackName }</PlayerTrackPlayAuthorLink>
+                {readyToPlay ? (
+                  <PlayerTrackPlayAuthorLink href="http://">{ trackData.name }</PlayerTrackPlayAuthorLink>
                 ) : (
                   <SkeletonTheme baseColor="#313131" highlightColor="#444">
                     <Skeleton variant="rectangular" width={59} height={15}/>
@@ -430,8 +492,8 @@ function AudioPlayer(props) {
                 )}
                 </PlayerTrackPlayAuthor>
                 <PlayerTrackPlayAlbum>
-                {props.musicInfo.isReady ? (
-                  <PlayerTrackPlayAlbumLink href="http://">{ props.musicInfo.authorName }</PlayerTrackPlayAlbumLink>
+                {readyToPlay ? (
+                  <PlayerTrackPlayAlbumLink href="http://">{ trackData.author }</PlayerTrackPlayAlbumLink>
                 ) : (
                   <SkeletonTheme baseColor="#313131" highlightColor="#444">
                     <Skeleton variant="rectangular" width={59} height={15}/>
