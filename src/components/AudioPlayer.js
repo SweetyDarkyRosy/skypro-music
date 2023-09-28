@@ -87,11 +87,24 @@ const PlayerButton = styled.div`
   align-items: center;
 `;
 
+const PlayerPushButtonSvgDefault = styled.svg`
+  fill: #D9D9D9;
+  cursor: pointer;
+
+  &:hover {
+    fill: #696969;
+  }
+
+  &:active {
+    fill: #D9D9D9;
+  }
+`
+
 const PlayerButtonPrev = styled(PlayerButton)`
   margin-right: 23px;
 `;
 
-const PlayerButtonPrevSvg = styled.svg`
+const PlayerButtonPrevSvg = styled(PlayerPushButtonSvgDefault)`
   width: 15px;
 	height: 14px;
 `;
@@ -100,10 +113,9 @@ const PlayerButtonPlay = styled(PlayerButton)`
   margin-right: 23px;
 `;
 
-const PlayerButtonPlaySvg = styled.svg`
+const PlayerButtonPlaySvg = styled(PlayerPushButtonSvgDefault)`
   width: 22px;
   height: 20px;
-  fill: #d9d9d9;
 `;
 
 const PlayerButtonNext = styled(PlayerButton)`
@@ -111,22 +123,13 @@ const PlayerButtonNext = styled(PlayerButton)`
   fill: #a53939;
 `;
 
-const PlayerButtonNextSvg = styled.svg`
+const PlayerButtonNextSvg = styled(PlayerPushButtonSvgDefault)`
   width: 15px;
   height: 14px;
-  fill: inherit;
-  stroke: #d9d9d9;
 `;
 
 const PlayerButtonRepeat = styled(PlayerButton)`
   margin-right: 24px;
-`;
-
-const PlayerButtonRepeatSvg = styled.svg`
-  width: 18px;
-  height: 12px;
-  fill: transparent;
-  stroke: #696969;
 `;
 
 const PlayerButtonShuffle = styled(PlayerButton)`
@@ -136,13 +139,6 @@ const PlayerButtonShuffle = styled(PlayerButton)`
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-`;
-
-const PlayerButtonShuffleSvg = styled.svg`
-  width: 19px;
-	height: 12px;
-	fill: transparent;
-	stroke: #696969;
 `;
 
 const PlayerTrackPlay = styled.div`
@@ -316,6 +312,8 @@ function AudioPlayer() {
   const [ currAudioProgress, setCurrAudioProgress ] = useState(0);
   const [ trackData, setTrackData ] = useState({ name: "", author: "" });
   const [ readyToPlay, setReadyToPlay ] = useState(false);
+  const [ isPlaying, setIfPlaying ] = useState(false);
+  const [ isLooped, setIfLooped ] = useState(false);
 
   const track = useSelector((state) => state.currentTrack);
   const playlist = useSelector((state) => state.playlist);
@@ -323,6 +321,20 @@ function AudioPlayer() {
   const shuffledPlaylist = useSelector((state) => state.shuffledPlaylist);
   const dispatch = useDispatch();
 
+
+  const PlayerButtonRepeatSvg = styled.svg`
+    width: 18px;
+    height: 12px;
+
+    fill: transparent;
+  `;
+
+  const PlayerButtonShuffleSvg = styled.svg`
+    width: 19px;
+    height: 12px;
+
+    fill: transparent;
+  `;
 
   const BarPlayerProgressWalker = {
     height: '5px',
@@ -342,13 +354,15 @@ function AudioPlayer() {
     }
   }
 
-  const onToggleLoopingButtonClick = () => {
-    if (audioComponentRef.current.loop === true)
+  const onToggleLoopButtonClick = () => {
+    if (isLooped === true)
     {
+      setIfLooped(false);
       audioComponentRef.current.loop = false;
     }
     else
     {
+      setIfLooped(true);
       audioComponentRef.current.loop = true;
     }
   }
@@ -367,6 +381,14 @@ function AudioPlayer() {
 
   const onVolumeChange = (event) => {
     audioComponentRef.current.volume = event.target.value / 100;
+  }
+
+  const onTrackPlaying = (event) => {
+    setIfPlaying(true);
+  }
+
+  const onTrackPause = (event) => {
+    setIfPlaying(false);
   }
 
   const onProgressBarClick = (event) => {
@@ -413,7 +435,6 @@ function AudioPlayer() {
 
     setTrackData({ name: track.name, author: track.author })
 
-    console.log("CHECK IT OUT!");
     audioComponentRef.current.currentTime = 0;
     audioComponentRef.current.src = track.url;
 
@@ -447,7 +468,10 @@ function AudioPlayer() {
               </PlayerButtonPrev>
               <PlayerButtonPlay className="_btn">
                 <PlayerButtonPlaySvg alt="play" onClick={ onPlayMusicButtonClick }>
-                  <use xlinkHref="img/icon/sprite.svg#icon-play"></use>
+                {isPlaying
+                  ? <use xlinkHref="img/icon/sprite.svg#icon-pause"></use>
+                  : <use xlinkHref="img/icon/sprite.svg#icon-play"></use>
+                }
                 </PlayerButtonPlaySvg>
               </PlayerButtonPlay>
               <PlayerButtonNext>
@@ -456,18 +480,18 @@ function AudioPlayer() {
                 </PlayerButtonNextSvg>
               </PlayerButtonNext>
               <PlayerButtonRepeat className="_btn-icon">
-                <PlayerButtonRepeatSvg alt="repeat" onClick={ onToggleLoopingButtonClick }>
+                <PlayerButtonRepeatSvg style={ { stroke: isLooped ? "#FFFFFF" : "#696969" }} alt="repeat" onClick={ onToggleLoopButtonClick }>
                   <use xlinkHref="img/icon/sprite.svg#icon-repeat"></use>
                 </PlayerButtonRepeatSvg>
               </PlayerButtonRepeat>
               <PlayerButtonShuffle className="_btn-icon">
-                <PlayerButtonShuffleSvg alt="shuffle" onClick={ onToggleShuffledButtonClick }>
+                <PlayerButtonShuffleSvg style={ { stroke: isShuffled ? "#FFFFFF" : "#696969" }} alt="shuffle" onClick={ onToggleShuffledButtonClick }>
                   <use xlinkHref="img/icon/sprite.svg#icon-shuffle"></use>
                 </PlayerButtonShuffleSvg>
               </PlayerButtonShuffle>
             </PlayerControls>
 
-            <audio ref={ audioComponentRef } onTimeUpdate={ updateTrackProgress } onEnded={ onTrackEnded }></audio>
+            <audio ref={ audioComponentRef } onPlaying={ onTrackPlaying } onPause={ onTrackPause } onTimeUpdate={ updateTrackProgress } onEnded={ onTrackEnded }></audio>
 
             <PlayerTrackPlay className="track-play">
               <PlayerTrackPlayContain>
