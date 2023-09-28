@@ -1,4 +1,5 @@
-import { GENERATE_SHUFFLED_PLAYLIST, SET_CURRENT_PLAYLIST, SET_CURRENT_TRACK, SET_NEXT_TRACK, SET_PREV_TRACK, SET_SHUFFLED } from "./types";
+import { GENERATE_SHUFFLED_PLAYLIST, SET_CURRENT_PLAYLIST, RESET_CURRENT_TRACK, SET_CURRENT_TRACK,
+	SET_NEXT_TRACK, SET_PREV_TRACK, SET_SHUFFLED } from "./types";
 import { getTrackSrcURL } from "../api";
 
 
@@ -24,6 +25,13 @@ export const setCurrTrack = (trackId) => {
 					});
 			}
 	}
+};
+
+export const resetCurrTrack = () => {
+	return {
+		type: RESET_CURRENT_TRACK,
+		payload: null
+	};
 };
 
 export const setPlaylist = (playlist) => {

@@ -4,7 +4,7 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { setIfShuffled, setNextTrack, setPrevTrack, generateShuffledPlaylist } from '../store/actions';
+import { setIfShuffled, resetCurrTrack, setNextTrack, setPrevTrack, generateShuffledPlaylist } from '../store/actions';
 
 
 const Bar = styled.div`
@@ -132,6 +132,12 @@ const PlayerButtonRepeat = styled(PlayerButton)`
   margin-right: 24px;
 `;
 
+const PlayerButtonRepeatSvg = styled.svg`
+  width: 18px;
+  height: 12px;
+  fill: transparent;
+`;
+
 const PlayerButtonShuffle = styled(PlayerButton)`
   display: -webkit-box;
   display: -ms-flexbox;
@@ -139,6 +145,13 @@ const PlayerButtonShuffle = styled(PlayerButton)`
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+`;
+
+
+const PlayerButtonShuffleSvg = styled.svg`
+  width: 19px;
+  height: 12px;
+  fill: transparent;
 `;
 
 const PlayerTrackPlay = styled.div`
@@ -322,20 +335,6 @@ function AudioPlayer() {
   const dispatch = useDispatch();
 
 
-  const PlayerButtonRepeatSvg = styled.svg`
-    width: 18px;
-    height: 12px;
-
-    fill: transparent;
-  `;
-
-  const PlayerButtonShuffleSvg = styled.svg`
-    width: 19px;
-    height: 12px;
-
-    fill: transparent;
-  `;
-
   const BarPlayerProgressWalker = {
     height: '5px',
     width: currAudioProgress + '%',
@@ -441,13 +440,12 @@ function AudioPlayer() {
     const handleCanPlayThrough = () => {
       audioComponentRef.current.play();
       setReadyToPlay(true);
+
+      audioComponentRef.current.removeEventListener("loadstart", handleCanPlayThrough);
     }
  
     audioComponentRef.current.addEventListener("loadstart", handleCanPlayThrough);
 
-    return () => {
-      audioComponentRef.current.removeEventListener("loadstart", handleCanPlayThrough);
-    };
   }, [track]);
 
 

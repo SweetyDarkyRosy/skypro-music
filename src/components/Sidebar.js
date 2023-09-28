@@ -77,11 +77,15 @@ const SidebarBlock = styled.div`
 function Sidebar() {
   const authContext = useAuthContext();
 
+  const logOut = () => {
+    authContext.signOut();
+  }
+
 	return (
 		<SidebarEl className="sidebar">
       <SidebarPersonal>
         <SidebarPersonalName>{ authContext.userData.username }</SidebarPersonalName>
-        <SidebarIcon>
+        <SidebarIcon onClick={ logOut }>
           <svg alt="logout">
             <use xlinkHref="img/icon/sprite.svg#logout"></use>
           </svg>

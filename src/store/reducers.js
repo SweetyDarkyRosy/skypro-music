@@ -1,5 +1,6 @@
 import { useDispatch } from "react-redux";
-import { GENERATE_SHUFFLED_PLAYLIST, SET_CURRENT_PLAYLIST, SET_CURRENT_TRACK, SET_NEXT_TRACK, SET_PREV_TRACK, SET_SHUFFLED } from "./types";
+import { GENERATE_SHUFFLED_PLAYLIST, SET_CURRENT_PLAYLIST, RESET_CURRENT_TRACK,
+	SET_CURRENT_TRACK, SET_NEXT_TRACK, SET_PREV_TRACK, SET_SHUFFLED } from "./types";
 
 
 const initialState = {
@@ -14,6 +15,7 @@ export const trackReducer = (state = null, action) => {
 	switch (action.type)
 	{
 		case SET_CURRENT_TRACK:
+		case RESET_CURRENT_TRACK:
 		case SET_PREV_TRACK:
 		case SET_NEXT_TRACK:
 		{
