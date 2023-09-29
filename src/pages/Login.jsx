@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from 'styled-components';
-import { logIn } from '../api'
+import { logIn, getToken } from '../api'
 import { useAuthContext } from '../authContext'
 
 
@@ -18,43 +18,72 @@ export const Login = ({ user, setUser }) => {
 	const authContext = useAuthContext();
 
 	const onLoginButtonClick = () => {
-		logIn({ email: eMailInputRef.current.value, password: passwordInputRef.current.value }).then((result) =>
+		logIn({ email: eMailInputRef.current.value, password: passwordInputRef.current.value }).then((logInResult) =>
 			{
-				switch (result.status)
+				switch (logInResult.status)
 				{
 					case 400:
 					{
-						console.log(" - Error: Could not register a new user because of non-compliance with the requirements");
+						console.error(" - Error: Could not register a new user because of non-compliance with the requirements");
 						break;
 					}
 
 					case 500:
 					{
-						console.log(" - Error: Could not send a request because of a server failure");
+						console.error(" - Error: Could not send a request because of a server failure");
 						break;
 					}
 
 					case 401:
 					{
-						console.log(" - Error: There is no user with such e-mail and password");
+						console.error(" - Error: There is no user with such e-mail and password");
 						break;
 					}
 
 					default:
 					{
-						
-						authContext.signIn(
-							{
-								userId: result.data.id,
-								username: result.data.username,
-								eMail: result.data.email
-							});
+						getToken({ email: eMailInputRef.current.value, password: passwordInputRef.current.value }).then((getTokenResult) => {
+								switch (getTokenResult.status)
+								{
+									case 400:
+									{
+										console.error(" - Error: Could not obtain a new token because of non-compliance with the requirements");
+										break;
+									}
 
-						navigate("/", { replace: true });
+									case 500:
+									{
+										console.error(" - Error: Could not send a request because of a server failure");
+										break;
+									}
+
+									case 401:
+									{
+										console.error(" - Error: There is no user with such e-mail and password");
+										break;
+									}
+
+									default:
+									{
+										authContext.signIn(
+											{
+												userId: logInResult.data.id,
+												username: logInResult.data.username,
+												eMail: logInResult.data.email,
+												refreshToken: getTokenResult.data.refresh,
+												accessToken: getTokenResult.data.access
+											});
+
+										navigate("/", { replace: true });
+									}
+								}
+							}).catch((error) => {
+									console.error(" - Error: Could not obtain a token");
+								});
 					}
 				}
 			}).catch((error) => {
-					console.log(" - Error: Could not log in");
+					console.error(" - Error: Could not log in");
 				});
 	}
 

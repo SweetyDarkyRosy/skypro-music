@@ -57,3 +57,42 @@ export async function logIn({ email, password }) {
 
 	return result;
 }
+
+export async function getToken({ email, password }) {
+	const response = await fetch(userDataAPIAddr + "token/",
+		{
+			method: "POST",
+			body: JSON.stringify(
+				{
+					email: email,
+					password: password
+				}),
+			headers: { "content-type": "application/json" }
+		});
+	const data = await response.json();
+	const result = {
+		status: response.status,
+		data: data
+	};
+
+	return result;
+}
+
+export async function refreshToken({ refreshToken }) {
+	const response = await fetch(userDataAPIAddr + "token/refresh/",
+		{
+			method: "POST",
+			body: JSON.stringify(
+				{
+					refresh: refreshToken
+				}),
+			headers: { "content-type": "application/json" }
+		});
+	const data = await response.json();
+	const result = {
+		status: response.status,
+		data: data
+	};
+
+	return result;
+}
