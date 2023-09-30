@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import { PageLayout } from './pages/PageLayout'
 import { MainPage } from './pages/MainPage'
 import { NotFound } from "./pages/NotFound";
 import { Login } from "./pages/Login";
@@ -12,9 +13,11 @@ export const AppRoutes = () => {
 	return (
 		<Routes>
 			<Route element={<PrivateRoute />}>
-				<Route path="/" element={<MainPage />}/>
-				<Route path="/category/:id" element={<Category />}/>
-				<Route path="/favorites" element={<Favorites />}/>
+				<Route path="/" element={<PageLayout />}>
+					<Route path="" element={<MainPage />}/>
+					<Route path="category/:id" element={<Category />}/>
+					<Route path="favorites" element={<Favorites />}/>
+				</Route>
 			</Route>
 			
 			<Route path="/login" element={<Login />}/>

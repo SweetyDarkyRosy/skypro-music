@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Track from './Track';
 import SearchBar from './SearchBar';
-import Filter from './Filter';
-import { getTrackList, getFavouriteTrackList } from '../api'
+import { getFavouriteTrackList } from '../api'
 import { setPreloadedPlaylist } from '../store/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuthContext } from '../authContext';
@@ -24,28 +23,6 @@ const TrackListSpecificH2 = styled.h2`
 	line-height: 72px;
 	letter-spacing: -0.8px;
 	margin-bottom: 45px;
-`;
-
-const TracklistFilterBlock = styled.div`
-  display: -webkit-box;
-	display: -ms-flexbox;
-	display: flex;
-	-webkit-box-orient: horizontal;
-	-webkit-box-direction: normal;
-	-ms-flex-direction: row;
-	flex-direction: row;
-	-webkit-box-align: center;
-	-ms-flex-align: center;
-	align-items: center;
-	margin-bottom: 51px;
-`;
-
-const TracklistFilterBlockTitle = styled.div`
-  font-style: normal;
-	font-weight: 400;
-	font-size: 16px;
-	line-height: 24px;
-	margin-right: 15px;
 `;
 
 const TracklistContent = styled.div`
@@ -120,26 +97,8 @@ const TracklistContentPlaylist = styled.div`
   overflow-y: auto;
 `;
 
-const TracklistFilterButton = styled.div`
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-  border: 1px solid #ffffff;
-  border-radius: 60px;
-  padding: 6px 20px;
 
-  &:not(:last-child) {
-    margin-right: 10px;
-  }
-`
-
-
-function Tracklist() {
-  const [isAuthorFilterVisible, setAuthorFilterLoadedState] = useState(false);
-
-  const toggleAuthorFilterVisibility = () => setAuthorFilterLoadedState(!isAuthorFilterVisible);
-
+function TracklistFavourites() {
   const [isTrackListLoadingSuccessful, setTrackListLoadingSuccessStatus] = useState(true);
   const [isTrackListLoaded, setIfTrackListLoaded] = useState(false);
 
@@ -149,45 +108,31 @@ function Tracklist() {
 
 
   useEffect(() => {
-      getTrackList().then((data) =>
+    getFavouriteTrackList(authContext.accessToken.accessToken).then((data) =>
         {
           const trackListProcessed = [];
 
-          getFavouriteTrackList(authContext.accessToken.accessToken).then((getFavouriteTracksResultData) => {
-              data.forEach((track) => {
-                  const durationStr = (Math.floor(track.duration_in_seconds / 60)) + ":" + (track.duration_in_seconds % 60);
+          data.forEach((track) => {
+              const durationStr = (Math.floor(track.duration_in_seconds / 60)) + ":" + (track.duration_in_seconds % 60);
     
-                  let isLiked = false;
-                  for (let i = 0; i < getFavouriteTracksResultData.length; i++)
-                  {
-                    if (getFavouriteTracksResultData[i].id === track.id)
-                    {
-                      isLiked = true;
-                      break;
-                    }
-                  }
+              const trackAdded = {
+                trackId: track.id,
+                trackName: track.name,
+                authorName: track.author,
+                albumName: track.author,
+                isLiked: true,
+                trackDuration: durationStr
+              };
     
-                  const trackAdded = {
-                    trackId: track.id,
-                    trackName: track.name,
-                    authorName: track.author,
-                    albumName: track.author,
-                    isLiked: isLiked,
-                    trackDuration: durationStr
-                  };
-    
-                  trackListProcessed.push(trackAdded);
-                });
+              trackListProcessed.push(trackAdded);
+            });
 
-                dispatch(setPreloadedPlaylist(trackListProcessed));
+            dispatch(setPreloadedPlaylist(trackListProcessed));
 
-                setIfTrackListLoaded(true);
-                setTrackListLoadingSuccessStatus(true);
-            }).catch((error) => {
-                console.error(" - Error: Could not get a list of favourite tracks");
-              });
+            setIfTrackListLoaded(true);
+            setTrackListLoadingSuccessStatus(true);
         }).catch((error) => {
-            console.error(" - Error: Could not load a list of tracks available");
+          console.error(" - Error: Could not get a list of favourite tracks");
 
             setTrackListLoadingSuccessStatus(false);
           });
@@ -196,23 +141,7 @@ function Tracklist() {
 	return (
 		<TracklistEl className="centerblock">
       <SearchBar/>
-      <TrackListSpecificH2>Треки</TrackListSpecificH2>
-      <TracklistFilterBlock className="filter">
-        <TracklistFilterBlockTitle>Искать по:</TracklistFilterBlockTitle>
-        <TracklistFilterButton className="button-author _btn-text" onClick={toggleAuthorFilterVisibility}>
-          исполнителю
-
-        {isAuthorFilterVisible && (
-          <Filter/>
-        )}
-        </TracklistFilterButton>
-        <TracklistFilterButton className="button-year _btn-text">
-          году выпуска
-        </TracklistFilterButton>
-        <TracklistFilterButton className="button-genre _btn-text">
-          жанру
-        </TracklistFilterButton>
-      </TracklistFilterBlock>
+      <TrackListSpecificH2>Мои треки</TrackListSpecificH2>
       {isTrackListLoadingSuccessful && (
         <TracklistContent>
           <TracklistContentTitleBlock className="playlist-title">
@@ -242,4 +171,4 @@ function Tracklist() {
 	);
 }
 
-export default Tracklist;
+export default TracklistFavourites;

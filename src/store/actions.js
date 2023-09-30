@@ -1,14 +1,14 @@
-import { GENERATE_SHUFFLED_PLAYLIST, SET_CURRENT_PLAYLIST, RESET_CURRENT_TRACK, SET_CURRENT_TRACK,
+import { GENERATE_SHUFFLED_PLAYLIST, SET_PRELOADED_PLAYLIST, SET_CURRENT_PLAYLIST, RESET_CURRENT_TRACK, SET_CURRENT_TRACK,
 	SET_NEXT_TRACK, SET_PREV_TRACK, SET_SHUFFLED } from "./types";
 import { getTrackSrcURL } from "../api";
 
 
-export const setCurrTrack = (trackId) => {
+export const setCurrTrack = (trackId, isLiked) => {
 	return async (dispatch) => {
 		try {
 			const incomingData = await getTrackSrcURL(trackId);
 			const trackData = { id: incomingData.id, name: incomingData.name, author: incomingData.author,
-				url: incomingData.track_file };
+				url: incomingData.track_file, isLiked: isLiked };
 
 			dispatch(
 				{
@@ -34,7 +34,14 @@ export const resetCurrTrack = () => {
 	};
 };
 
-export const setPlaylist = (playlist) => {
+export const setPreloadedPlaylist = (playlist) => {
+	return {
+		type: SET_PRELOADED_PLAYLIST,
+		payload: playlist
+	};
+};
+
+export const setCurrentPlaylist = (playlist) => {
 	return {
 		type: SET_CURRENT_PLAYLIST,
 		payload: playlist

@@ -1,11 +1,11 @@
-import { useDispatch } from "react-redux";
 import { GENERATE_SHUFFLED_PLAYLIST, SET_CURRENT_PLAYLIST, RESET_CURRENT_TRACK,
-	SET_CURRENT_TRACK, SET_NEXT_TRACK, SET_PREV_TRACK, SET_SHUFFLED } from "./types";
+	SET_CURRENT_TRACK, SET_NEXT_TRACK, SET_PREV_TRACK, SET_SHUFFLED, SET_PRELOADED_PLAYLIST } from "./types";
 
 
 const initialState = {
 	currentTrack: null,
-	playlist: [],
+	preloadedPlaylist: [],
+	currPlaylist: [],
 	isShuffled: false,
 	shuffledPlaylist: []
 };
@@ -29,7 +29,22 @@ export const trackReducer = (state = null, action) => {
 	}
 };
 
-export const playlistReducer = (state = [], action) => {
+export const preloadedPlaylistReducer = (state = [], action) => {
+	switch (action.type)
+	{
+		case SET_PRELOADED_PLAYLIST:
+		{
+			return action.payload;
+		}
+
+		default:
+		{
+			return state;
+		}
+	}
+};
+
+export const currPlaylistReducer = (state = [], action) => {
 	switch (action.type)
 	{
 		case SET_CURRENT_PLAYLIST:

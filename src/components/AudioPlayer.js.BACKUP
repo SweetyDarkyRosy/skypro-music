@@ -4,9 +4,7 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { setIfShuffled, setNextTrack, setPrevTrack, generateShuffledPlaylist } from '../store/actions';
-import { addFavouriteTrack, deleteFavouriteTrack } from '../api';
-import { useAuthContext } from '../authContext';
+import { setIfShuffled, resetCurrTrack, setNextTrack, setPrevTrack, generateShuffledPlaylist } from '../store/actions';
 
 
 const Bar = styled.div`
@@ -239,8 +237,6 @@ const PlayerTrackPlayAlbumLink = styled.a`
 `;
 
 const PlayerTrackPlayLikeDislike = styled.div`
-  margin-left: 26%;
-
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -251,17 +247,7 @@ const PlayerTrackPlayLikeDislike = styled.div`
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-
-  fill: ${ props => (props.isLiked ? '#696969' : `transparent`) };
-  stroke: ${ props => (props.isLiked ? '#FFFFFF' : `#696969`) };
-
-  &:hover {
-    stroke: #ACACAC;
-  }
-
-  &:active {
-    stroke: #FFFFFF;
-  }
+  margin-left: 26%;
 `;
 
 const PlayerTrackPlayLike = styled.div`
@@ -271,6 +257,19 @@ const PlayerTrackPlayLike = styled.div`
 const PlayerTrackPlayLikeSvg = styled.svg`
   width: 14px;
 	height: 12px;
+	fill: transparent;
+	stroke: #696969;
+`;
+
+const PlayerTrackPlayDislike = styled(PlayerTrackPlayLike)`
+  margin-left: 28.5px;
+`;
+
+const PlayerTrackPlayDislikeSvg = styled.svg`
+  width: 14.34px;
+  height: 13px;
+  fill: transparent;
+  stroke: #696969;
 `;
 
 const Volume = styled.div`
@@ -335,7 +334,6 @@ function AudioPlayer() {
   const currPlaylist = useSelector((state) => state.currPlaylist);
   const isShuffled = useSelector((state) => state.isShuffled);
   const shuffledPlaylist = useSelector((state) => state.shuffledPlaylist);
-  const authContext = useAuthContext();
   const dispatch = useDispatch();
 
 
@@ -429,29 +427,6 @@ function AudioPlayer() {
 
   const onTrackEnded = () => {
     onPrevTrackButtonClick();
-  }
-
-  const onLikeClick = (event) => {
-    event.preventDefault();
-
-    if (isLiked === true)
-    {
-      deleteFavouriteTrack(track.id, authContext.accessToken.accessToken).then(() =>
-        {
-          setIfLiked(false);
-        }).catch((error) => {
-            console.error(" - Error: Could not delete track from the favourites");
-          });
-    }
-    else
-    {
-      addFavouriteTrack(track.id, authContext.accessToken.accessToken).then(() =>
-        {
-          setIfLiked(true);
-        }).catch((error) => {
-            console.error(" - Error: Could not add the track to the favourites");
-          });
-    }
   }
 
   useEffect(() => {
@@ -551,12 +526,17 @@ function AudioPlayer() {
                 </PlayerTrackPlayAlbum>
               </PlayerTrackPlayContain>
 
-              <PlayerTrackPlayLikeDislike isLiked={ isLiked } onClick={ onLikeClick } className="_btn-icon">
+              <PlayerTrackPlayLikeDislike>
                 <PlayerTrackPlayLike className="_btn-icon">
                   <PlayerTrackPlayLikeSvg alt="like">
                     <use xlinkHref="img/icon/sprite.svg#icon-like"></use>
                   </PlayerTrackPlayLikeSvg>
                 </PlayerTrackPlayLike>
+                <PlayerTrackPlayDislike className="_btn-icon">
+                  <PlayerTrackPlayDislikeSvg alt="dislike">
+                    <use xlinkHref="img/icon/sprite.svg#icon-dislike"></use>
+                  </PlayerTrackPlayDislikeSvg>
+                </PlayerTrackPlayDislike>
               </PlayerTrackPlayLikeDislike>
             </PlayerTrackPlay>
           </Player>

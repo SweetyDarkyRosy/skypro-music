@@ -135,7 +135,7 @@ const TracklistFilterButton = styled.div`
 `
 
 
-function Tracklist() {
+function TracklistCommon() {
   const [isAuthorFilterVisible, setAuthorFilterLoadedState] = useState(false);
 
   const toggleAuthorFilterVisibility = () => setAuthorFilterLoadedState(!isAuthorFilterVisible);
@@ -242,4 +242,4 @@ function Tracklist() {
 	);
 }
 
-export default Tracklist;
+export default TracklistCommon;

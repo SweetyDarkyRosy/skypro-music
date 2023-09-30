@@ -1,8 +1,12 @@
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import styled from 'styled-components';
-import { setCurrTrack } from '../store/actions'
+import { setCurrTrack, setCurrentPlaylist } from '../store/actions'
 import { useDispatch } from 'react-redux';
+import { addFavouriteTrack, deleteFavouriteTrack } from '../api'
+import { useAuthContext } from '../authContext';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 
 const PlaylistItem = styled.div`
@@ -120,8 +124,19 @@ const TrackTimeSvg = styled.svg`
   width: 14px;
   height: 12px;
   margin-right: 17px;
-  fill: transparent;
-  stroke: #696969;
+
+  cursor: pointer;
+
+  fill: ${ props => (props.isLiked ? '#B672FF' : `transparent`) };
+  stroke: ${ props => (props.isLiked ? '#B672FF' : `#696969`) };
+
+  &:hover {
+    stroke: #ACACAC;
+  }
+
+  &:active {
+    stroke: #FFFFFF;
+  }
 `;
 
 const TrackTimeText = styled.span`
@@ -136,19 +151,47 @@ const TrackTimeText = styled.span`
 
 function Track(props) {
   const dispatch = useDispatch();
+  const authContext = useAuthContext();
+  const preloadedPlaylist = useSelector((state) => state.preloadedPlaylist);
+
+  const [isLiked, setIfLiked] = useState(props.isLiked);
 
 
   const playTrack = (event) => {
     event.preventDefault();
 
-    dispatch(setCurrTrack(props.trackId));
+    dispatch(setCurrentPlaylist(preloadedPlaylist));
+    dispatch(setCurrTrack(props.trackId, isLiked));
   }
 
+  const onLikeClick = (event) => {
+    event.preventDefault();
+
+    if (isLiked === true)
+    {
+      deleteFavouriteTrack(props.trackId, authContext.accessToken.accessToken).then(() =>
+        {
+          setIfLiked(false);
+        }).catch((error) => {
+            console.error(" - Error: Could not delete track from the favourites");
+          });
+    }
+    else
+    {
+      addFavouriteTrack(props.trackId, authContext.accessToken.accessToken).then(() =>
+        {
+          setIfLiked(true);
+        }).catch((error) => {
+            console.error(" - Error: Could not add the track to the favourites");
+          });
+    }
+  }
+  
 
 	return (
 		<PlaylistItem>
-      <PlaylistTrack className="track" onClick={playTrack}>
-        <TrackTitle>
+      <PlaylistTrack className="track">
+        <TrackTitle onClick={playTrack}>
           <TrackTitleImg>
           {(props.isTrackLoaded) ? (
             <TrackTitleSvg alt="music">
@@ -196,7 +239,7 @@ function Track(props) {
 
         {(props.isTrackLoaded) && (
           <div>
-            <TrackTimeSvg alt="time">
+            <TrackTimeSvg isLiked={ isLiked } alt="time" onClick={ onLikeClick }>
               <use xlinkHref="img/icon/sprite.svg#icon-like"></use>
             </TrackTimeSvg>
             <TrackTimeText>{ props.trackTime }</TrackTimeText>

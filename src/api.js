@@ -16,6 +16,55 @@ export async function getTrackSrcURL(trackId) {
 	return data;
 }
 
+export async function addFavouriteTrack(trackId, token) {
+	const response = await fetch(trackDataAPIAddr + "track/" + trackId + "/favorite/",
+		{
+			method: "POST",
+			headers: {
+					Authorization: `Bearer ${token}`,
+				},
+		});
+	const data = await response.json();
+
+	const result = {
+		status: response.status,
+		data: data
+	};
+
+	return result;
+}
+
+export async function deleteFavouriteTrack(trackId, token) {
+	const response = await fetch(trackDataAPIAddr + "track/" + trackId + "/favorite/",
+		{
+			method: "DELETE",
+			headers: {
+					Authorization: `Bearer ${token}`,
+				},
+		});
+	const data = await response.json();
+
+	const result = {
+		status: response.status,
+		data: data
+	};
+
+	return result;
+}
+
+export async function getFavouriteTrackList(token) {
+	const response = await fetch(trackDataAPIAddr + "track/favorite/all/",
+		{
+			method: "GET",
+			headers: {
+					Authorization: `Bearer ${token}`,
+				},
+		});
+	const data = await response.json();
+
+	return data;
+}
+
 export async function registerNewUser({ email, password, username }) {
 	const response = await fetch(userDataAPIAddr + "signup/",
 		{

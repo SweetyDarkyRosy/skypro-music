@@ -1,11 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { playlistReducer, trackReducer, shuffledStateReducer, shuffledPlaylistReducer } from "./reducers";
+import { preloadedPlaylistReducer, currPlaylistReducer, trackReducer, shuffledStateReducer, shuffledPlaylistReducer } from "./reducers";
 
 
 export const store = configureStore({
 	reducer: {
 		currentTrack: trackReducer,
-		playlist: playlistReducer,
+		preloadedPlaylist: preloadedPlaylistReducer,
+		currPlaylist: currPlaylistReducer,
 		isShuffled: shuffledStateReducer,
 		shuffledPlaylist: shuffledPlaylistReducer }
 	});
