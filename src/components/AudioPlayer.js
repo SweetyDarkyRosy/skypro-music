@@ -551,13 +551,15 @@ function AudioPlayer() {
                 </PlayerTrackPlayAlbum>
               </PlayerTrackPlayContain>
 
-              <PlayerTrackPlayLikeDislike isLiked={ isLiked } onClick={ onLikeClick } className="_btn-icon">
-                <PlayerTrackPlayLike className="_btn-icon">
-                  <PlayerTrackPlayLikeSvg alt="like">
-                    <use xlinkHref="img/icon/sprite.svg#icon-like"></use>
-                  </PlayerTrackPlayLikeSvg>
-                </PlayerTrackPlayLike>
-              </PlayerTrackPlayLikeDislike>
+              {false && (
+                <PlayerTrackPlayLikeDislike isLiked={ isLiked } onClick={ onLikeClick } className="_btn-icon">
+                  <PlayerTrackPlayLike className="_btn-icon">
+                    <PlayerTrackPlayLikeSvg alt="like">
+                      <use xlinkHref="img/icon/sprite.svg#icon-like"></use>
+                    </PlayerTrackPlayLikeSvg>
+                  </PlayerTrackPlayLike>
+                </PlayerTrackPlayLikeDislike>)
+              }
             </PlayerTrackPlay>
           </Player>
           <Volume className="volume">
