@@ -396,7 +396,9 @@ function AudioPlayer() {
   }
 
   const onProgressBarClick = (event) => {
-    const barBoundingClientRect = event.target.getBoundingClientRect();
+    const barBoundingClientRect = event.currentTarget.getBoundingClientRect();
+
+    console.log(barBoundingClientRect.right);
 
     audioComponentRef.current.currentTime = Math.round(audioComponentRef.current.duration *
       (event.clientX - barBoundingClientRect.left) / (barBoundingClientRect.right - barBoundingClientRect.left));
