@@ -76,17 +76,17 @@ const SearchInput = styled.input`
 `;
 
 
-function SearchBar() {
+function SearchBar({ setSearchParamFunc }) {
+  const onSearchInputChange = (event) => {
+    setSearchParamFunc(event.target.value);
+  }
+
 	return (
 		<SearchBlockEl className="search">
       <SearchSvg>
         <use xlinkHref="img/icon/sprite.svg#icon-search"></use>
       </SearchSvg>
-      <SearchInput
-        type="search"
-        placeholder="Поиск"
-        name="search"
-      />
+      <SearchInput type="search" placeholder="Поиск" name="search" onChange={ onSearchInputChange }/>
     </SearchBlockEl>
 	);
 }

@@ -102,9 +102,66 @@ function TracklistFavourites() {
   const [isTrackListLoadingSuccessful, setTrackListLoadingSuccessStatus] = useState(true);
   const [isTrackListLoaded, setIfTrackListLoaded] = useState(false);
 
+  const [searchParam, setSearchParam] = useState("");
+
   const preloadedPlaylist = useSelector((state) => state.preloadedPlaylist);
   const dispatch = useDispatch();
   const authContext = useAuthContext();
+
+  let setSearchInputTimeout = null;
+
+  const onSearchParamChanged = (searchParamValue) => {
+    const setSearchInput = () => {
+      setSearchParam(searchParamValue);
+    }
+
+    clearTimeout(setSearchInputTimeout);
+    setSearchInputTimeout = setTimeout(setSearchInput, 1000)
+  }
+
+  useEffect(() => {
+    getFavouriteTrackList(authContext.accessToken.accessToken).then((data) =>
+        {
+          const trackListProcessed = [];
+
+          data.forEach((track) => {
+              let isAccepted = true;
+
+              if (searchParam !== "")
+              {
+                if (track.name.includes(searchParam) === false)
+                {
+                  isAccepted = false;
+                }
+              }
+
+              if (isAccepted === true)
+              {
+                const durationStr = (Math.floor(track.duration_in_seconds / 60)) + ":" + (track.duration_in_seconds % 60);
+      
+                const trackAdded = {
+                  trackId: track.id,
+                  trackName: track.name,
+                  authorName: track.author,
+                  albumName: track.author,
+                  isLiked: true,
+                  trackDuration: durationStr
+                };
+      
+                trackListProcessed.push(trackAdded);
+              }
+            });
+            
+            dispatch(setPreloadedPlaylist(trackListProcessed));
+
+            setIfTrackListLoaded(true);
+            setTrackListLoadingSuccessStatus(true);
+        }).catch((error) => {
+          console.error(" - Error: Could not get a list of favourite tracks");
+
+            setTrackListLoadingSuccessStatus(false);
+          });
+    }, [searchParam])
 
 
   useEffect(() => {
@@ -126,7 +183,7 @@ function TracklistFavourites() {
     
               trackListProcessed.push(trackAdded);
             });
-
+            
             dispatch(setPreloadedPlaylist(trackListProcessed));
 
             setIfTrackListLoaded(true);
@@ -140,7 +197,7 @@ function TracklistFavourites() {
 
 	return (
 		<TracklistEl className="centerblock">
-      <SearchBar/>
+      <SearchBar setSearchParamFunc={ onSearchParamChanged } />
       <TrackListSpecificH2>Мои треки</TrackListSpecificH2>
       {isTrackListLoadingSuccessful && (
         <TracklistContent>

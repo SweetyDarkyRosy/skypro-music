@@ -24,7 +24,7 @@ export const Login = ({ user, setUser }) => {
 				{
 					case 400:
 					{
-						console.error(" - Error: Could not register a new user because of non-compliance with the requirements");
+						console.error(" - Error: Could not log in because of non-compliance with the requirements");
 						break;
 					}
 

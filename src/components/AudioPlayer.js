@@ -4,7 +4,7 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { setIfShuffled, setNextTrack, setPrevTrack, generateShuffledPlaylist } from '../store/actions';
+import { setIfShuffled, setNextTrack, setPrevTrack, generateShuffledPlaylist, setPreloadedPlaylist, setIfCurrTrackIsLiked } from '../store/actions';
 import { addFavouriteTrack, deleteFavouriteTrack } from '../api';
 import { useAuthContext } from '../authContext';
 
@@ -329,10 +329,11 @@ function AudioPlayer() {
   const [ readyToPlay, setReadyToPlay ] = useState(false);
   const [ isPlaying, setIfPlaying ] = useState(false);
   const [ isLooped, setIfLooped ] = useState(false);
-  const [ isLiked, setIfLiked ] = useState(false);
 
   const track = useSelector((state) => state.currentTrack);
+  const isTrackLiked = useSelector((state) => state.isCurrentTrackLiked);
   const currPlaylist = useSelector((state) => state.currPlaylist);
+  const preloadedPlaylist = useSelector((state) => state.preloadedPlaylist);
   const isShuffled = useSelector((state) => state.isShuffled);
   const shuffledPlaylist = useSelector((state) => state.shuffledPlaylist);
   const authContext = useAuthContext();
@@ -434,11 +435,37 @@ function AudioPlayer() {
   const onLikeClick = (event) => {
     event.preventDefault();
 
-    if (isLiked === true)
+    async function updateTracklist(isLiked) {
+      const currTracklist = [];
+      let isChanged = false;
+
+      for (let i = 0; i < preloadedPlaylist.length; i++)
+      {
+        currTracklist.push(Object.assign({}, preloadedPlaylist[i]));
+
+        if (currTracklist[i].trackId === track.id)
+        {
+          currTracklist[i].isLiked = isLiked;
+          isChanged = true;
+        }
+      }
+
+      if (isChanged === true)
+      {
+        dispatch(setPreloadedPlaylist(currTracklist));
+      }
+    }
+
+    async function updateCurrTrackLikedState(isLiked) {
+      dispatch(setIfCurrTrackIsLiked(isLiked));
+    }
+
+    if (isTrackLiked === true)
     {
       deleteFavouriteTrack(track.id, authContext.accessToken.accessToken).then(() =>
         {
-          setIfLiked(false);
+          updateCurrTrackLikedState(false);
+          updateTracklist(false);
         }).catch((error) => {
             console.error(" - Error: Could not delete track from the favourites");
           });
@@ -447,7 +474,8 @@ function AudioPlayer() {
     {
       addFavouriteTrack(track.id, authContext.accessToken.accessToken).then(() =>
         {
-          setIfLiked(true);
+          updateCurrTrackLikedState(true);
+          updateTracklist(true);
         }).catch((error) => {
             console.error(" - Error: Could not add the track to the favourites");
           });
@@ -458,8 +486,6 @@ function AudioPlayer() {
     audioComponentRef.current.pause();
 
     setReadyToPlay(false);
-
-    setIfLiked(track.isLiked);
 
     audioComponentRef.current.currentTime = 0;
     audioComponentRef.current.src = track.url;
@@ -551,15 +577,13 @@ function AudioPlayer() {
                 </PlayerTrackPlayAlbum>
               </PlayerTrackPlayContain>
 
-              {false && (
-                <PlayerTrackPlayLikeDislike isLiked={ isLiked } onClick={ onLikeClick } className="_btn-icon">
-                  <PlayerTrackPlayLike className="_btn-icon">
-                    <PlayerTrackPlayLikeSvg alt="like">
-                      <use xlinkHref="img/icon/sprite.svg#icon-like"></use>
-                    </PlayerTrackPlayLikeSvg>
-                  </PlayerTrackPlayLike>
-                </PlayerTrackPlayLikeDislike>)
-              }
+              <PlayerTrackPlayLikeDislike isLiked={ isTrackLiked } onClick={ onLikeClick } className="_btn-icon">
+                <PlayerTrackPlayLike className="_btn-icon">
+                  <PlayerTrackPlayLikeSvg alt="like">
+                    <use xlinkHref="img/icon/sprite.svg#icon-like"></use>
+                  </PlayerTrackPlayLikeSvg>
+                </PlayerTrackPlayLike>
+              </PlayerTrackPlayLikeDislike>
             </PlayerTrackPlay>
           </Player>
           <Volume className="volume">

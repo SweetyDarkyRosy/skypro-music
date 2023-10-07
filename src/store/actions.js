@@ -1,5 +1,5 @@
 import { GENERATE_SHUFFLED_PLAYLIST, SET_PRELOADED_PLAYLIST, SET_CURRENT_PLAYLIST, RESET_CURRENT_TRACK, SET_CURRENT_TRACK,
-	SET_NEXT_TRACK, SET_PREV_TRACK, SET_SHUFFLED } from "./types";
+	SET_CURRENT_TRACK_LIKED_STATE, SET_NEXT_TRACK, SET_PREV_TRACK, SET_SHUFFLED } from "./types";
 import { getTrackSrcURL } from "../api";
 
 
@@ -14,6 +14,12 @@ export const setCurrTrack = (trackId, isLiked) => {
 				{
 					type: SET_CURRENT_TRACK,
 					payload: trackData
+				});
+
+			dispatch(
+				{
+					type: SET_CURRENT_TRACK_LIKED_STATE,
+					payload: isLiked
 				});
 		} catch (error) {
 				console.error(" - Error: Could not load a track");
@@ -31,6 +37,13 @@ export const resetCurrTrack = () => {
 	return {
 		type: RESET_CURRENT_TRACK,
 		payload: null
+	};
+};
+
+export const setIfCurrTrackIsLiked = (isLiked) => {
+	return {
+		type: SET_CURRENT_TRACK_LIKED_STATE,
+		payload: isLiked
 	};
 };
 

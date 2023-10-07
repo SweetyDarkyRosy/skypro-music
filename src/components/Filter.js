@@ -4,13 +4,9 @@ import styled from 'styled-components';
 const FilterEl = styled.div`
 	padding: 34px;
 
-	float: left;
 	position: absolute;
-	
-
+	top: 42px;
 	z-index: 50;
-
-	top: 288px;
 
 	background-color: #313131;
 
@@ -25,12 +21,23 @@ const FilterList = styled.ul`
 
 const FilterListElement = styled.li`
 	margin-right: 24px;
+
+	width: 100%;
+
+	color: ${ props => (props.isChosen ? '#AD61FF' : `inherit`) };
+	text-decoration: ${ props => (props.isChosen ? 'underline' : `none`) };
 	
 	&:not(:last-child) {
 		margin-bottom: 28px;
 	}
 
-	width: 100%;
+	&:hover {
+		color: #D9B6FF;
+	}
+
+	&:active {
+		color: #AD61FF;
+	}
 `;
 
 const FilterListElementText = styled.a`
@@ -43,34 +50,40 @@ const FilterListElementText = styled.a`
 `;
 
 
-function Filter() {
+function Filter({ options, currOption, action, isMandatory }) {
+	function onOptionPressed(event) {
+		event.stopPropagation();
+		
+		const optionValue = event.currentTarget.getAttribute("option");
+
+		if (isMandatory === true)
+		{
+			action(optionValue);
+		}
+		else
+		{
+			if (currOption === optionValue)
+			{
+				action(null);
+			}
+			else
+			{
+				action(optionValue);
+			}
+		}
+	}
+
 	return (
 		<FilterEl>
 			<FilterList>
-				<FilterListElement>
-					<FilterListElementText>Michael Jackson</FilterListElementText>
-				</FilterListElement>
-				<FilterListElement>
-					<FilterListElementText>Frank Sinatra</FilterListElementText>
-				</FilterListElement>
-				<FilterListElement>
-					<FilterListElementText>Calvin Harris</FilterListElementText>
-				</FilterListElement>
-				<FilterListElement>
-					<FilterListElementText>Zhu</FilterListElementText>
-				</FilterListElement>
-				<FilterListElement>
-					<FilterListElementText>Arctic Monkeys</FilterListElementText>
-				</FilterListElement>
-				<FilterListElement>
-					<FilterListElementText>Arctic Monkeys</FilterListElementText>
-				</FilterListElement>
-				<FilterListElement>
-					<FilterListElementText>Arctic Monkeys</FilterListElementText>
-				</FilterListElement>
-				<FilterListElement>
-					<FilterListElementText>Arctic Monkeys</FilterListElementText>
-				</FilterListElement>
+				{
+					options.map((option) => {
+							return (
+								<FilterListElement onClick={ onOptionPressed } option={ option } isChosen={ (option === currOption) ? true : false } >
+									<FilterListElementText>{ option }</FilterListElementText>
+								</FilterListElement>);
+						})
+				}
 			</FilterList>
 		</FilterEl>
 	);

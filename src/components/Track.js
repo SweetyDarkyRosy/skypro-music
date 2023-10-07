@@ -1,12 +1,11 @@
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import styled from 'styled-components';
-import { setCurrTrack, setCurrentPlaylist } from '../store/actions'
-import { useDispatch } from 'react-redux';
-import { addFavouriteTrack, deleteFavouriteTrack } from '../api'
-import { useAuthContext } from '../authContext';
+import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { setCurrTrack, setCurrentPlaylist, setIfCurrTrackIsLiked } from '../store/actions'
+import { useAuthContext } from '../authContext';
+import { addFavouriteTrack, deleteFavouriteTrack } from '../api'
 
 
 const PlaylistItem = styled.div`
@@ -153,8 +152,9 @@ function Track(props) {
   const dispatch = useDispatch();
   const authContext = useAuthContext();
   const preloadedPlaylist = useSelector((state) => state.preloadedPlaylist);
+  const currTrack = useSelector((state) => state.currentTrack);
 
-  const [isLiked, setIfLiked] = useState(props.isLiked);
+  const [isLiked, setIfLiked] = useState(false);
 
 
   const playTrack = (event) => {
@@ -167,11 +167,20 @@ function Track(props) {
   const onLikeClick = (event) => {
     event.preventDefault();
 
+    async function updateCurrTrackLikedState(isLiked) {
+      dispatch(setIfCurrTrackIsLiked(isLiked));
+    }
+
     if (isLiked === true)
     {
       deleteFavouriteTrack(props.trackId, authContext.accessToken.accessToken).then(() =>
         {
           setIfLiked(false);
+
+          if (currTrack.id === props.trackId)
+          {
+            updateCurrTrackLikedState(false);
+          }
         }).catch((error) => {
             console.error(" - Error: Could not delete track from the favourites");
           });
@@ -181,12 +190,20 @@ function Track(props) {
       addFavouriteTrack(props.trackId, authContext.accessToken.accessToken).then(() =>
         {
           setIfLiked(true);
+
+          if (currTrack.id === props.trackId)
+          {
+            updateCurrTrackLikedState(true);
+          }
         }).catch((error) => {
             console.error(" - Error: Could not add the track to the favourites");
           });
     }
   }
   
+  useEffect(() => {
+      setIfLiked(props.isLiked);
+    }, [props.isLiked]);
 
 	return (
 		<PlaylistItem>

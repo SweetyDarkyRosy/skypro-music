@@ -81,6 +81,7 @@ function SidebarFull() {
     authContext.signOut();
   }
 
+
 	return (
 		<SidebarEl className="sidebar">
       <SidebarPersonal>
@@ -93,9 +94,9 @@ function SidebarFull() {
       </SidebarPersonal>
       <SidebarBlock>
         <SidebarList>
-          <Playlist imageSrcPath="img/playlist01.png" categoryId="1"/>
-          <Playlist imageSrcPath="img/playlist02.png" categoryId="2"/>
-          <Playlist imageSrcPath="img/playlist03.png" categoryId="3"/>
+          <Playlist categoryLabel="Классическая музыка" imageSrcPath="img/playlist02.png" categoryId="2"/>
+          <Playlist categoryLabel="Электронная музыка" imageSrcPath="img/playlist03.png" categoryId="3"/>
+          <Playlist categoryLabel="Рок музыка" imageSrcPath="img/playlist01.png" categoryId="1"/>
         </SidebarList>
       </SidebarBlock>
     </SidebarEl>

@@ -65,6 +65,20 @@ export async function getFavouriteTrackList(token) {
 	return data;
 }
 
+export async function getSelectionList() {
+	const response = await fetch(trackDataAPIAddr + "selection/", { method: "GET" });
+	const data = await response.json();
+
+	return data;
+}
+
+export async function getSpecificSelectionList(categoryId) {
+	const response = await fetch(trackDataAPIAddr + "selection/" + categoryId + "/", { method: "GET" });
+	const data = await response.json();
+
+	return data;
+}
+
 export async function registerNewUser({ email, password, username }) {
 	const response = await fetch(userDataAPIAddr + "signup/",
 		{
