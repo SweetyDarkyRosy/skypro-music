@@ -256,32 +256,18 @@ function TracklistCommon() {
                 }
               });
 
-            if (chosenReleaseYearDirecion != 'По умолчанию')
+            if (chosenReleaseYearDirecion != "По умолчанию")
             {
-              if (chosenReleaseYearDirecion == 'Сначала новые')
+              if (chosenReleaseYearDirecion == "Сначала новые")
               {
-                trackListProcessed.sort((a, b) => { 
-                      if (Date.parse(b["releaseDate"]) >= Date.parse(a["releaseDate"]))
-                      {
-                        return true;
-                      }
-                      else
-                      {
-                        return false;
-                      }
-                    });
+                trackListProcessed.sort((a, b) => {
+                    return (Date.parse(b["releaseDate"]) >= Date.parse(a["releaseDate"])) || -((Date.parse(b["releaseDate"]) < Date.parse(a["releaseDate"])))
+                  });
               }
               else
               {
-                trackListProcessed.sort((a, b) => { 
-                  if (Date.parse(b["releaseDate"]) < Date.parse(a["releaseDate"]))
-                  {
-                    return true;
-                  }
-                  else
-                  {
-                    return false;
-                  }
+                trackListProcessed.sort((a, b) => {
+                  return ((Date.parse(b["releaseDate"]) < Date.parse(a["releaseDate"]))) || -((Date.parse(b["releaseDate"]) >= Date.parse(a["releaseDate"])))
                 });
               }
             }
